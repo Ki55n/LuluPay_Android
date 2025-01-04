@@ -1,0 +1,2 @@
+# Referenced at /storage/emulated/0/CodeAssistProjects/LuluPay/app/build/bin/AndroidManifest.xml:18
+-keep class androidx.core.app.CoreComponentFactory { <init>(); }

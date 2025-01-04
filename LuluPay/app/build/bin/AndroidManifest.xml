@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sdk.lulupay"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="34" />
+
+    <permission
+        android:name="com.sdk.lulupay.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.sdk.lulupay.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
+    <application android:appComponentFactory="androidx.core.app.CoreComponentFactory" >
+    </application>
+
+</manifest>
