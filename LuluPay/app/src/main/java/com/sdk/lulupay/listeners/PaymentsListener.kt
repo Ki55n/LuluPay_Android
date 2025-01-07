@@ -1,5 +1,4 @@
 package com.sdk.lulupay.listeners
 
-interface PaymentListener {
-    
+interface PaymentsListener {
 }

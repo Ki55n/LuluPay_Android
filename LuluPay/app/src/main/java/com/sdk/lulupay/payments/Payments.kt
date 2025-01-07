@@ -1,7 +1,6 @@
-package com.mycompany.application.payments
+package com.sdk.lulupay.payments
 
-class UtilityPayment {
-    
+class Payments {
     val TAG: String = "UtilityPayment"
     
 }

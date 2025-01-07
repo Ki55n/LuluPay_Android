@@ -1,9 +1,9 @@
 package com.sdk.lulupay.network.interfaces
 
+// import com.sdk.lulupay.model.request.body.ConfirmTransactionRequest
+// import com.sdk.lulupay.model.response.ConfirmTransactionResponse
 import com.sdk.lulupay.model.request.body.*
 import com.sdk.lulupay.model.response.*
-import com.sdk.lulupay.model.request.body.ConfirmTransactionRequest
-import com.sdk.lulupay.model.response.ConfirmTransactionResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -21,11 +21,15 @@ interface ApiService {
   @FormUrlEncoded
   @POST("auth/realms/cdp/protocol/openid-connect/token")
   fun getAccessToken(
+      @Header("Content-Type")
+      contentType: String =
+          "application/x-www-form-urlencoded", // Default to 'application/x-www-form-urlencoded'
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Field("username") username: String,
       @Field("password") password: String,
       @Field("grant_type") grantType: String,
       @Field("client_id") clientId: String,
+      @Field("scope") scope: String,
       @Field("client_secret") clientSecret: String
   ): Call<AccessTokenResponse>
 
@@ -33,7 +37,7 @@ interface ApiService {
   @POST("api/v1_0/paas/quote")
   fun createQuote(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String, // Sender info
       @Header("channel") channel: String, // Channel info
       @Header("company") company: String, // Company info
@@ -44,29 +48,29 @@ interface ApiService {
   @POST("api/v1_0/paas/createtransaction")
   fun createTransaction(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
       @Header("branch") branch: String? = null,
       @Body request: CreateTransactionRequest
   ): Call<CreateTransactionResponse>
-  
+
   @POST("/api/v1_0/ras/confirmtransaction")
   fun confirmTransaction(
-  @Header("Authorization") authorization: String, // Bearer token
-  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
-  @Header("sender") sender: String? = null, // Sender info
-  @Header("channel") channel: String? = null, // Channel info
-  @Header("company") company: String? = null, // Company info
-  @Header("branch") branch: String? = null, // Branch info
-  @Body payload: ConfirmTransactionRequest // Request payload
+      @Header("Authorization") authorization: String, // Bearer token
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("sender") sender: String? = null, // Sender info
+      @Header("channel") channel: String? = null, // Channel info
+      @Header("company") company: String? = null, // Company info
+      @Header("branch") branch: String? = null, // Branch info
+      @Body payload: ConfirmTransactionRequest // Request payload
   ): Call<ConfirmTransactionResponse>
 
   @POST("api/v1_0/paas/authorize-clearance")
   fun authorizeClearance(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -77,7 +81,7 @@ interface ApiService {
   @GET("api/v1_0/paas/enquire-transaction")
   fun enquireTransaction(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -88,7 +92,7 @@ interface ApiService {
   @POST("api/v1_0/ras/brn-update")
   fun updateBrn(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -99,7 +103,7 @@ interface ApiService {
   @GET("api/v1_0/ras/transaction-receipt")
   fun getTransactionReceipt(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -110,7 +114,7 @@ interface ApiService {
   @POST("api/v1_0/ras/canceltransaction")
   fun cancelTransaction(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -121,7 +125,7 @@ interface ApiService {
   @PUT("api/v1_0/paas/status-update")
   fun updateStatus(
       @Header("Authorization") authorization: String,
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null,
       @Header("channel") channel: String? = null,
       @Header("company") company: String? = null,
@@ -136,7 +140,7 @@ interface ApiService {
   @GET("raas/masters/v1/codes")
   fun getCodes(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String, // Sender info
       @Header("channel") channel: String, // Channel info
       @Header("company") company: String, // Company info
@@ -148,7 +152,7 @@ interface ApiService {
   @GET("raas/masters/v1/service-corridor")
   fun getServiceCorridor(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String, // Sender info
       @Header("channel") channel: String, // Channel info
       @Header("company") company: String, // Company info
@@ -161,7 +165,7 @@ interface ApiService {
   @GET("raas/masters/v1/banks")
   fun getMasterBanks(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Query("receiving_country_code") countryCode: String, // Required
       @Query("receiving_mode") receivingMode: String? = null, // Optional
       @Query("correspondent") correspondent: String? = null, // Optional
@@ -174,7 +178,7 @@ interface ApiService {
   @GET("raas/masters/v1/banks/{bankId}")
   fun getMasterBankById(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Query("correspondent") correspondent: String? = null, // Query parameter (optional)
       @Path("bankId") bankId: String // Bank ID as a path parameter
   ): Call<MasterBankDetailResponse>
@@ -182,7 +186,7 @@ interface ApiService {
   @GET("raas/masters/v1/banks/{bankId}/branches")
   fun getBankBranches(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Path("bankId") bankId: String, // Bank ID as a path parameter
       @Query("receiving_country_code") receivingCountryCode: String,
       @Query("receiving_mode") receivingMode: String,
@@ -196,7 +200,7 @@ interface ApiService {
   @GET("raas/masters/v1/banks/{bankId}/branches/{branchId}")
   fun getBranchDetails(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Path("bankId") bankId: String, // Bank ID as a path parameter
       @Path("branchId") branchId: String, // Branch ID as a path parameter
       @Query("correspondent") correspondent: String? // Optional query parameter
@@ -205,7 +209,7 @@ interface ApiService {
   @GET("raas/masters/v1/branches/lookup")
   fun searchBranch(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String, // Sender info
       @Header("company") company: String, // Company info
       @Header("branch") branch: String, // Branch info
@@ -222,14 +226,14 @@ interface ApiService {
   @GET("raas/masters/v1/accounts/balance")
   fun getAgentCreditBalance(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Query("payment_mode") payment_mode: String? = null
   ): Call<AgentCreditBalanceResponse>
 
   @GET("raas/masters/v1/rates")
   fun getRates(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Query("receiving_currency_code") receiving_currency_code: String? = null,
       @Query("receiving_country_code") receiving_country_code: String? = null,
       @Query("include_correspondents") include_correspondents: String? = null,
@@ -240,7 +244,7 @@ interface ApiService {
   @GET("raas/masters/v1/accounts/validation")
   fun validateAccount(
       @Header("Authorization") authorization: String, // Bearer token
-	  @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Query("receiving_country_code") receivingCountryCode: String, // Query parameter
       @Query("receiving_mode") receivingMode: String, // Query parameter
       @Query("correspondent") correspondent: String? = null, // Query parameter

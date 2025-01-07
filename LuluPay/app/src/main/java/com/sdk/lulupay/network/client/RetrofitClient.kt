@@ -30,10 +30,11 @@ object RetrofitClient {
   .addInterceptor(loggingInterceptor) // Logs the request/response
   .build()
 
-  val retrofit: Retrofit =
-      Retrofit.Builder()
-          .baseUrl(BASE_URL)
-          .client(okHttpClient)
-          .addConverterFactory(GsonConverterFactory.create())
-          .build()
+  fun createRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 }

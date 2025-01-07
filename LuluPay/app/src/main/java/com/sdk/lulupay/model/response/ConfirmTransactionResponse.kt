@@ -1,6 +1,6 @@
 package com.sdk.lulupay.model.response
 
-data class ConfirmTransactionRequest(
+data class ConfirmTransactionResponse(
     val status: String,
     val statusCode: Int,
     val data: TransactionStatusData

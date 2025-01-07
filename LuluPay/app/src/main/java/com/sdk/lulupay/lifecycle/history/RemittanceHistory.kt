@@ -1,5 +1,5 @@
 package com.sdk.lulupay.lifecycle.history
 
-class TransferHistory {
+class RemittanceHistory {
 	
 }
