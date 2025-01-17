@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:id="@+id/main"
+    android:background="@drawable/cutom_four_round_c"
+    android:layout_margin="10dp">
+<TextView
+    android:id="@+id/heading"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Sender Details"
+    android:textSize="22sp"
+    style="@style/TextAppearance.Material3.BodyLarge"/>
+    <!-- Account Number Input -->
+
+    <EditText
+        android:id="@+id/accountNumberInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/heading"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Account Number"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Recipient Country Spinner -->
+    <Spinner
+        android:id="@+id/recipientCountrySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/accountNumberInput"
+        android:background="@drawable/custom_edit_text"
+        android:padding="18dp" />
+
+    <!-- ISO Code Input -->
+    <EditText
+        android:id="@+id/isoCodeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/recipientCountrySpinner"
+        android:background="@drawable/custom_edit_text"
+        android:hint="ISO Code"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Routing Code Input -->
+    <EditText
+        android:id="@+id/routingCodeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/isoCodeInput"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Routing Code"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Payment Mode Spinner -->
+    <Spinner
+        android:id="@+id/paymentModeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/routingCodeInput"
+        android:background="@drawable/custom_edit_text"
+        android:padding="18dp" />
+
+    <!-- Sender Name Input -->
+    <EditText
+        android:id="@+id/senderNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/paymentModeSpinner"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Sender Name"
+        android:inputType="text"
+        android:padding="18dp" />
+    <!-- Sender Name Input -->
+    <EditText
+        android:id="@+id/senderPhoneInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/senderNameInput"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Sender phone number"
+        android:inputType="text"
+        android:padding="18dp" />
+    <!-- Channel Name Input -->
+    <EditText
+        android:id="@+id/channelNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/senderPhoneInput"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Channel Name"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Company Code Input -->
+    <EditText
+        android:id="@+id/companyCodeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/channelNameInput"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Company Code"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Branch Code Input -->
+    <EditText
+        android:id="@+id/branchCodeInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/companyCodeInput"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Branch Code"
+        android:inputType="text"
+        android:padding="18dp" />
+
+    <!-- Get Details Button -->
+    <Button
+        android:id="@+id/detailsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/branchCodeInput"
+        android:background="@drawable/custom_button_back"
+        android:padding="10dp"
+        android:text="Get Details"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+</RelativeLayout>
