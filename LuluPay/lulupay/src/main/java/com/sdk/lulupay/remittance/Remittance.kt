@@ -42,7 +42,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -122,7 +122,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -194,7 +194,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -257,7 +257,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -320,7 +320,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -383,7 +383,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -446,7 +446,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -509,7 +509,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -572,7 +572,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -635,7 +635,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "password",
                       clientId = SessionManager.clientId ?: "cdp_app",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret
                               ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
 
@@ -698,7 +698,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "",
                       clientId = SessionManager.clientId ?: "",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret ?: "")
 
               val error = result.exceptionOrNull()
@@ -766,7 +766,7 @@ class Remittance {
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       grantType = SessionManager.grantType ?: "",
                       clientId = SessionManager.clientId ?: "",
-                      scope = SessionManager.scope ?: "",
+                      scope = SessionManager.scope,
                       clientSecret = SessionManager.clientSecret ?: "")
 
               val error = result.exceptionOrNull()

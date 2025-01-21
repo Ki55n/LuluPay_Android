@@ -19,7 +19,7 @@ class AccessToken {
         requestId: String,
         grantType: String,
         clientId: String,
-        scope: String,
+        scope: String?,
         clientSecret: String
     ): Result<AccessTokenResponse> {
       return try {

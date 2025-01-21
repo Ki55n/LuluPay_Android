@@ -40,7 +40,7 @@ class LoginScreen : AppCompatActivity() {
   }
 
   private fun loginUser(username: String, password: String) {
-    addSession(username = username, password = password, grantType = "password", clientId = "cdp_app", scope = "", clientSecret = "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
+    addSession(username = username, password = password, grantType = "password", clientId = "cdp_app", scope = null, clientSecret = "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
     
     redirect()
   }
@@ -102,7 +102,7 @@ class LoginScreen : AppCompatActivity() {
       password: String,
       grantType: String,
       clientId: String,
-      scope: String,
+      scope: String?,
       clientSecret: String
   ) {
     SessionManager.username = username
