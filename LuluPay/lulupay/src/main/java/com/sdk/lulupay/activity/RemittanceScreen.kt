@@ -30,6 +30,7 @@ class RemittanceScreen : AppCompatActivity() {
 
   private lateinit var addNewReceipientFab: FloatingActionButton
   private lateinit var recyclerView: RecyclerView
+  private lateinit var backButton: ImageButton
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -46,12 +47,17 @@ class RemittanceScreen : AppCompatActivity() {
   private fun setupViews() {
     addNewReceipientFab = findViewById(R.id.fab)
     recyclerView = findViewById(R.id.recyclerView)
+    backButton = findViewById(R.id.back_button)
   }
 
   private fun setClickListener() {
     addNewReceipientFab.setOnClickListener {
       val intent = Intent(this, AddNewReceipient::class.java)
       startActivity(intent)
+    }
+    
+    backButton.setOnClickListener{
+    finish()
     }
   }
 

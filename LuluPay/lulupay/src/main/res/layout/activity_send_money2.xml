@@ -37,12 +37,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_contact" />
-    
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-		android:id="@+id/fab"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_margin="16dp"
-		android:layout_gravity="right|bottom" />
 
 </LinearLayout>

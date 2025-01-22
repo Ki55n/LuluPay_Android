@@ -12,21 +12,87 @@ import kotlinx.coroutines.withContext
 
 class Remittance {
   companion object {
+  suspend fun branchLookup(sortCode: String, routingCode: String, swiftCode: String, partnerName: String, receivingCountryCode: String, receivingMode: String, listener: BranchLookupListener){
+  try{
+  val apiService = RetrofitClient.retrofit.create(ApiService::class.java)
+
+        // Get the access token
+        val token: String =
+            if (!Timer.isRunning) {
+              val result =
+                  AccessToken.getAccessToken(
+                      username = SessionManager.username ?: "",
+                      password = SessionManager.password ?: "",
+                      requestId = partnerName + "-" + RequestId.generateRequestId(),
+                      grantType = SessionManager.grantType ?: "password",
+                      clientId = SessionManager.clientId ?: "cdp_app",
+                      scope = SessionManager.scope,
+                      clientSecret = SessionManager.clientSecret
+                              ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
+
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                listener.onFailed(error.message ?: "Error occurred: Null")
+                return
+              }
+
+              val newToken = result.getOrNull()?.access_token
+              if (newToken.isNullOrEmpty()) {
+                listener.onFailed("Access token is null or empty")
+                return
+              }
+
+              AccessToken.access_token = newToken // Cache the token
+              newToken
+            } else {
+              AccessToken.access_token
+            }
+
+        val response =
+            withContext(Dispatchers.IO) {
+              apiService
+                  .searchBranch(
+                      authorization = "Bearer $token",
+                      requestId = partnerName + "-" + RequestId.generateRequestId(),
+                      sender = partnerName,
+                      receiving_mode = receivingMode,
+                      receivingCountryCode = receivingCountryCode,
+                      correspondent = null,
+                      code = sortCode ?: null,
+                      isoCode = swiftCode ?: null,
+                      routing_code = routingCode ?: null)
+                  .execute()
+            }
+
+        if (response.isSuccessful) {
+          val responses = response.body()
+          if (responses != null) {
+            listener.onSuccess(responses)
+          } else {
+            listener.onFailed("Response body is null")
+          }
+        } else {
+          listener.onFailed("Error: ${response.errorBody()?.string() ?: "Unknown error"}")
+        }
+      } catch (e: Exception) {
+        listener.onFailed("Unexpected error: ${e.message}")
+      }
+  }
     suspend fun validateAccount(
         partnerName: String,
         correspondent: String,
         receiving_country_code: String,
         receiving_mode: String,
         iso_code: String,
-        routing_code: Int,
-        sort_code: String,
-        iban: String,
+        routing_code: Int? = null,
+        sort_code: String? = null,
+        iban: String? = null,
         bank_id: String,
         branch_id: String,
         first_name: String,
         middle_name: String,
         last_name: String,
-        account_number: String,
+        account_number: String? = null,
         listener: ValidateAccountListener
     ) {
       try {
@@ -664,7 +730,7 @@ class Remittance {
                       authorization = "Bearer $token",
                       requestId = partnerName + "-" + RequestId.generateRequestId(),
                       sender = partnerName,
-                      code = "RECEIVING_MODES",
+                      code = "PURPOSE_OF_TRANSACTIONS",
                       service_type = "C2C")
                   .execute()
             }

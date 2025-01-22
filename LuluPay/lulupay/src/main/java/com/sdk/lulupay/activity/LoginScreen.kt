@@ -46,6 +46,7 @@ class LoginScreen : AppCompatActivity() {
   }
 
  private fun redirect() {
+ dismissDialog()
     val intent = Intent(this, RemittanceScreen::class.java)
     val bundle = Bundle() // Use 'val' and correct Kotlin syntax for instantiation
     bundle.putBoolean(MANUAL_LOGIN, true) // Key-value pair
@@ -76,19 +77,21 @@ class LoginScreen : AppCompatActivity() {
   }
 
   private fun showDialog() {
-
     // Build the AlertDialog
-    dialog =
-        AlertDialog.Builder(this)
-            .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
-            .create()
+    dialog = AlertDialog.Builder(this)
+        .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
+        .setCancelable(false) // Disable back button dismiss
+        .create()
+
+    // Prevent dialog from dismissing on outside touch
+    dialog.setCanceledOnTouchOutside(false)
 
     // Show the dialog
     dialog.show()
-  }
+}
 
   private fun dismissDialog() {
-    if (::dialog.isInitialized) {
+    if (dialog.isShowing == true) {
       dialog.dismiss()
     }
   }
