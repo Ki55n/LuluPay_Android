@@ -12,7 +12,7 @@ data class BankDetail(
     val routingCode: String,
     val bicSwift: String,
     val sortCode: String,
-    val address: String,
+    val address: String? = null,
     val townName: String,
     val countrySubdivision: String
 )

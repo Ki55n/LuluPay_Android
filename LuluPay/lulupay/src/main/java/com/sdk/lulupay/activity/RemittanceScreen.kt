@@ -1,25 +1,35 @@
 package com.sdk.lulupay.activity
 
 import android.content.Intent
+import android.util.Log
 import android.os.Bundle
 import android.widget.*
 import androidx.recyclerview.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.sdk.lulupay.token.AccessToken
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.sdk.lulupay.R
-import com.sdk.lulupay.database.LuluPayDB
+import com.sdk.lulupay.database.*
 import com.sdk.lulupay.listeners.*
 import com.sdk.lulupay.model.response.*
 import com.sdk.lulupay.session.SessionManager
+import com.sdk.lulupay.remittance.Remittance
+import com.sdk.lulupay.recyclerView.*
+import com.sdk.lulupay.requestId.RequestId
+import com.sdk.lulupay.singleton.ActivityCloseManager
+import com.sdk.lulupay.storage.SecureLoginStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
-class RemittanceScreen : AppCompatActivity() {
+class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
 
   private lateinit var errorDialog: AlertDialog
+  private lateinit var dialog: AlertDialog
 
   private lateinit var luluPayDB: LuluPayDB
 
@@ -37,11 +47,20 @@ class RemittanceScreen : AppCompatActivity() {
     setContentView(R.layout.remittance)
 
     luluPayDB = LuluPayDB(this)
-
+    
+    registerListeners()
     handleIntentExtras()
     setupViews()
     getHistoryRemittance()
     setClickListener()
+  }
+  
+  private fun registerListeners(){
+    ActivityCloseManager.registerListener(this)
+  }
+  
+  private fun destroyListeners(){
+   ActivityCloseManager.unregisterListener(this) // Avoid memory leaks
   }
 
   private fun setupViews() {
@@ -63,6 +82,7 @@ class RemittanceScreen : AppCompatActivity() {
 
   private fun handleIntentExtras() {
     val intent = getIntent()
+    
 
     if (intent.getBooleanExtra(MANUAL_LOGIN, false)) {
         handleManualLogin()
@@ -71,11 +91,19 @@ class RemittanceScreen : AppCompatActivity() {
 
     if (intent.getBooleanExtra(AUTO_LOGIN, false)) {
         handleAutoLogin(intent)
-    } else {
-        // Redirect to login screen
+        return
+    }
+    
+    // Retrieve stored credentials securely
+     val (username, password) = SecureLoginStorage.getLoginDetails(this)
+     if (username != null && password != null) {
+     showDialog()
+    loginUser(username, password)
+     } else {
+    // Redirect to login screen
         showMessage("Please login")
         redirectToLoginScreen()
-    }
+}
 }
 
 private fun handleManualLogin() {
@@ -109,14 +137,9 @@ private fun handleAutoLogin(intent: Intent) {
         }
 
         else -> {
-            addSession(
-                username,
-                password,
-                "password",
-                "cdp_app",
-                "",
-                "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y"
-            )
+            
+            showDialog()
+            loginUser(username, password)
         }
     }
 }
@@ -126,6 +149,7 @@ private fun handleAutoLogin(intent: Intent) {
     builder.setTitle(title)
     builder.setMessage(errorMessage)
     builder.setPositiveButton("Close") { dialog, _ ->
+        dialog.dismiss()
         finish() // Close the dialog when "OK" is clicked
     }
     val dialog = builder.create()
@@ -135,17 +159,224 @@ private fun handleAutoLogin(intent: Intent) {
   private fun getHistoryRemittance() {
     lifecycleScope.launch {
       try {
+      var remittanceList: List<RemittanceHistory>
         withContext(Dispatchers.IO) {
-          val remittanceList = luluPayDB.getAllData()
-          // Use the data (e.g., log it or display it in a RecyclerView)
-          remittanceList.forEach { remittance ->
-            // println("Sender: ${remittance.senderName}, Channel: ${remittance.channelName}")
+          remittanceList = luluPayDB.getAllData()
           }
-        }
+          // Use the data (e.g., log it or display it in a RecyclerView)
+          setupRecyclerViewRecipientsAdapter(remittanceList)
       } catch (e: Exception) {
         // Handle error
         showMessage(e.message ?: "An unexpected error occurred")
       }
+    }
+  }
+  
+  private fun setupRecyclerViewRecipientsAdapter(receipient: List<RemittanceHistory>){
+        val receipients = receipient.map {
+            Receipients(
+                firstName = it.firstName,
+                lastName = it.lastName,
+                phoneNo = it.phoneNo,
+                transactionRefNo = it.transactionRefNo
+            )
+        }
+        var adapter = ReceipientsAdapter(receipients) { position, _->
+        val selected = receipients[position]
+        
+        val transactionRefNo = selected.transactionRefNo
+        
+         showDialog()
+         getEnquireTransaction(transactionRefNo)
+        }
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+    }
+    
+    private fun getEnquireTransaction(transactionRefNo: String){
+      lifecycleScope.launch {
+        Remittance.enquireTransaction(transactionRefNo = transactionRefNo, listener = object : EnquireTransactionListener{
+           override fun onSuccess(response: EnquireTransactionResponse){
+            sortEnquireTransactionResponse(response)
+           }
+           
+           override fun onFailed(errorMessage: String){
+            dismissDialog()
+            if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
+           }
+        })
+      }
+    }
+    
+    private fun sortEnquireTransactionResponse(response: EnquireTransactionResponse) {
+
+    // Extract data from the response
+    val data = response.data
+    
+    var correspondent: String? = null
+    var bankId: String? = null
+    var branchId: String? = null
+    
+    if(data.receiver.cashpickup_details?.correspondent != null){
+       correspondent = data.receiver.cashpickup_details?.correspondent
+       }else if(data.receiver.mobilewallet_details?.correspondent != null){
+       correspondent = data.receiver.mobilewallet_details?.correspondent
+       }else{
+       correspondent = null
+       }
+       
+    if(data.receiver.cashpickup_details?.correspondent_id != null){
+      bankId = data.receiver.cashpickup_details?.correspondent_id
+    }else if(data.receiver.mobilewallet_details?.bank_id != null){
+      bankId = data.receiver.mobilewallet_details?.bank_id
+    }else{
+      bankId = null
+    }
+    
+    if(data.receiver.cashpickup_details?.correspondent_location_id != null){
+      branchId = data.receiver.cashpickup_details?.correspondent_location_id
+    }else if(data.receiver.mobilewallet_details?.branch_id != null){
+      branchId = data.receiver.mobilewallet_details?.branch_id
+    }else{
+      branchId = null
+    }
+    
+    val receivingMode: String = data.transaction.receiving_mode
+    val receivingCountryCode: String = data.transaction.receiving_country_code
+    
+    getServiceCorridor(data, correspondent, bankId, branchId, receivingMode, receivingCountryCode)
+}
+
+  private fun getServiceCorridor(data: TransactionData, correspondent: String?, bankId: String?, branchId: String?, receivingMode: String, receivingCountryCode: String) {
+    lifecycleScope.launch {
+        Remittance.getServiceCorridor(
+            partnerName = SessionManager.username ?: "",
+            receiving_mode = receivingMode,
+            receiving_country_code = receivingCountryCode,
+            listener =
+                object : ServiceCorridorListener {
+                  override fun onSuccess(response: ServiceCorridorResponse) {
+                    dismissDialog()
+                    
+                    val remittanceDetail = response.data.firstOrNull() ?: return // Safely handle empty list
+                    
+                    val intent = Intent(this@RemittanceScreen, RemittanceDetails::class.java)
+                    // Map the response data to the intent extras
+    intent.putExtra("SENDING_COUNTRY_CODE", data.transaction.sending_country_code as String?)
+    intent.putExtra("TYPE", data.type)
+    intent.putExtra("RECEIVING_MODE", data.transaction.receiving_mode as String?)
+    intent.putExtra("RECEIVING_MODE_NAME", data.transaction.receiving_mode as String?)// Assuming receiving_mode is the same as receiving_mode_name
+    intent.putExtra("RECEIVING_COUNTRY_CODE", data.transaction.receiving_country_code as String?)
+    intent.putExtra("LIMIT_MIN_AMOUNT", remittanceDetail.limit_min_amount) // Assuming this is not provided in the response
+    intent.putExtra("LIMIT_PER_TRANSACTION", remittanceDetail.limit_per_transaction) // Assuming this is not provided in the response
+    intent.putExtra("SEND_MIN_AMOUNT", remittanceDetail.send_min_amount) // Assuming this is not provided in the response
+    intent.putExtra("SEND_MAX_AMOUNT", remittanceDetail.send_max_amount) // Assuming this is not provided in the response
+    intent.putExtra("CORRESPONDENT", correspondent as String?)
+    intent.putExtra("BANK_ID", bankId as String?)
+    intent.putExtra("BRANCH_ID", branchId as String?)
+    intent.putExtra("SENDER_CURRENCY_CODE", data.transaction.sending_currency_code as String?)
+    intent.putExtra("RECEIVER_CURRENCY_CODE", data.transaction.receiving_currency_code as String?)
+    intent.putExtra("CORRESPONDENT_NAME", null as String?)
+    intent.putExtra("BANK_ID", null as String?) // Assuming this is not provided in the response
+    intent.putExtra("BRANCH_ID", null as String?) // Assuming this is not provided in the response
+    intent.putExtra("ROUTING_CODE", data.receiver.bank_details?.routing_code as String?)
+    intent.putExtra("ISO_CODE", data.receiver.bank_details?.iso_code as String?)
+    //intent.putExtra("SORT_CODE", data.receiver.bank_details?.sort_code as String?)
+    intent.putExtra("IBAN", data.receiver.bank_details?.iban as String?)
+    intent.putExtra("ACCOUNT_NUMBER", data.receiver.bank_details?.account_number as String?)
+    intent.putExtra("RECEIVER_FIRST_NAME", data.receiver.first_name as String?)
+    intent.putExtra("RECEIVER_MIDDLE_NAME", data.receiver.middle_name as String?)
+    intent.putExtra("RECEIVER_LAST_NAME", data.receiver.last_name as String?)
+    intent.putExtra("INSTRUMENT", data.instrument as String?)
+    intent.putExtra("RECEIVER_PHONE_NO", data.receiver.mobile_number as String?)
+    intent.putExtra("ACCOUNT_TYPE_CODE", data.receiver.bank_details?.account_type as String?)
+
+    // Start the RemittanceDetails activity
+    startActivity(intent)
+                  }
+
+                  override fun onFailed(errorMessage: String) {
+                    dismissDialog()
+                    if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
+                  }
+                })
+    }
+  }
+  
+  fun isLikelyJson(input: String): Boolean {
+    return input.trimStart().startsWith('{') || input.trimStart().startsWith('[')
+}
+  
+  private fun extractErrorMessageData(errorMessage: String){
+    val gson = Gson()
+
+    // Parse the JSON string into a JsonObject
+    val jsonObject = gson.fromJson(errorMessage, JsonObject::class.java)
+
+    // Extract the "message" value
+    val message = jsonObject.get("message").asString
+    
+    showMessage(message)
+  }
+  
+  private fun loginUser(username: String, password: String){
+     lifecycleScope.launch {
+        try {
+            // Get access token
+            val result = AccessToken.getAccessToken(
+                username = username,
+                password = password,
+                requestId = "$username-${RequestId.generateRequestId()}",
+                grantType = "password",
+                clientId = "cdp_app",
+                scope = null,
+                clientSecret = "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y"
+            )
+
+            val error = result.exceptionOrNull()
+            if (error != null) {
+                dismissDialog()
+                showError("Error Occurred", (error.message ?: "Error occurred: Null"))
+                showMessage(error.message ?: "Error occurred: Null")
+                return@launch
+            }
+
+            val newToken = result.getOrNull()?.access_token
+            if (newToken.isNullOrEmpty()) {
+                dismissDialog()
+                showError("Error Occurred", "Access token is null or empty")
+                showMessage("Access token is null or empty")
+                return@launch
+            }
+            
+            addSession(
+                username,
+                password,
+                "password",
+                "cdp_app",
+                null,
+                "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y"
+            )
+            
+            dismissDialog()
+        } catch(e: Exception){
+          dismissDialog()
+          showError("Error Occurred", (e.message ?: "Error occurred: Null"))
+          if(isLikelyJson(e.message ?: "Error occurred: Null")){
+                extractErrorMessageData(e.message ?: "")
+                }else{
+                showMessage(e.message ?: "Error occurred: Null")
+                }
+        }
     }
   }
 
@@ -154,13 +385,33 @@ private fun handleAutoLogin(intent: Intent) {
     startActivity(intent)
     finish()
   }
+  
+  private fun showDialog() {
+    // Build the AlertDialog
+    dialog = AlertDialog.Builder(this, R.style.TransparentDialog)
+        .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
+        .setCancelable(false) // Disable back button dismiss
+        .create()
+
+    // Prevent dialog from dismissing on outside touch
+    dialog.setCanceledOnTouchOutside(false)
+
+    // Show the dialog
+    dialog.show()
+}
+
+  private fun dismissDialog() {
+    if (dialog.isShowing == true) {
+      dialog.dismiss()
+    }
+  }
 
   private fun addSession(
       username: String,
       password: String,
       grantType: String,
       clientId: String,
-      scope: String,
+      scope: String?,
       clientSecret: String
   ) {
     SessionManager.username = username
@@ -174,4 +425,13 @@ private fun handleAutoLogin(intent: Intent) {
   private fun showMessage(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
   }
+  
+  override fun onFinishActivity() {
+        finish() // Close this activity when called
+    }
+  
+  override fun onDestroy() {
+        super.onDestroy()
+        destroyListeners()
+    }
 }

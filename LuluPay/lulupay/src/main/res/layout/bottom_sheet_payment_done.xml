@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@id/paymentStatusText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="You’ve successfully sent $400.00 USD to Jessica Pearson"
+        android:text=""
         android:textColor="@color/gray"
         android:textSize="18sp"
         android:gravity="center"

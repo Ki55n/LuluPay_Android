@@ -4,6 +4,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
@@ -27,6 +28,9 @@ object RetrofitClient {
   // OkHttp Client with interceptors
   private val okHttpClient =
       OkHttpClient.Builder()
+          .connectTimeout(10000, TimeUnit.SECONDS)
+          .readTimeout(10000, TimeUnit.SECONDS)
+          .writeTimeout(10000, TimeUnit.SECONDS)
           .addInterceptor(headerInterceptor) // Adds the Content-Type header
           .addInterceptor(loggingInterceptor) // Logs the request/response
           .build()

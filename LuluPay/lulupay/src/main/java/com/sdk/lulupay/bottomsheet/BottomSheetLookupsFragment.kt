@@ -2,6 +2,7 @@ package com.sdk.lulupay.bottomsheet
 
 import android.os.Bundle
 import android.widget.*
+import android.app.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.lifecycleScope
@@ -16,20 +18,22 @@ import com.sdk.lulupay.R
 import androidx.appcompat.app.AlertDialog
 import com.sdk.lulupay.listeners.*
 import com.sdk.lulupay.model.response.*
-import  com.sdk.lulupay.recyclerView.*
+import com.sdk.lulupay.recyclerView.*
 import com.sdk.lulupay.remittance.Remittance
 import kotlinx.coroutines.launch
 
 class BottomSheetLookupsFragment : BottomSheetDialogFragment() {
     companion object {
         private const val ARG_RECEIVING_MODE = "receiving_mode"
+        private const val ARG_RECEIVING_NAME = "receivingName"
         private const val ARG_SENDER = "sender"
         private const val ARG_COUNTRY = "country"
 
-        fun newInstance(receivingMode: String, sender: String, country: String): BottomSheetLookupsFragment {
+        fun newInstance(receivingMode: String, receivingName: String, sender: String, country: String): BottomSheetLookupsFragment {
             val fragment = BottomSheetLookupsFragment()
             val args = Bundle()
             args.putString(ARG_RECEIVING_MODE, receivingMode)
+            args.putString(ARG_RECEIVING_NAME, receivingName)
             args.putString(ARG_SENDER, sender)
             args.putString(ARG_COUNTRY, country)
             fragment.arguments = args
@@ -45,6 +49,7 @@ class BottomSheetLookupsFragment : BottomSheetDialogFragment() {
     private lateinit var adapter: BankDetailsAdapter
     
     private var receivingMode = ""
+    private var receivingName = ""
     private var sender = ""
     private var country = ""
     
@@ -62,6 +67,27 @@ private var branchFullName: String = ""
 private var countryCode: String = ""
 private var ifsc: String = ""
 private var bic: String = ""
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    // Create the BottomSheetDialog
+    val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+
+    // Set a listener to perform actions after the dialog is shown
+    dialog.setOnShowListener { dialogInterface ->
+        val bottomSheetDialog = dialogInterface as BottomSheetDialog
+        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+
+        if (bottomSheet != null) {
+            // Customize the BottomSheet behavior
+            val behavior = BottomSheetBehavior.from(bottomSheet)
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED // Expand the BottomSheet by default
+            bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+            bottomSheet.requestLayout()
+        }
+    }
+
+    return dialog
+}
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +109,7 @@ private var bic: String = ""
 
         // Set RecyclerView with a LinearLayoutManager and Adapter
         receivingMode = arguments?.getString(ARG_RECEIVING_MODE) ?: ""
+        receivingName = arguments?.getString(ARG_RECEIVING_NAME) ?: ""
         sender = arguments?.getString(ARG_SENDER) ?: ""
         country = arguments?.getString(ARG_COUNTRY) ?: ""
         
@@ -91,16 +118,38 @@ private var bic: String = ""
     
     private fun setClickListener(){
     buttonSearch.setOnClickListener{
+    var sortCodeValue : String? = null
+    var swiftCodeValue : String? = null
+    var routingCodeValue : String? = null
+    
+    if(sortCodeEdittext.text.toString().isNullOrBlank()){
+    sortCodeValue = null
+    }else{
+    sortCodeValue = sortCodeEdittext.text.toString()
+    }
+    
+    if(swiftCodeEdittext.text.toString().isNullOrBlank()){
+    swiftCodeValue = null
+    }else{
+    swiftCodeValue = swiftCodeEdittext.text.toString()
+    }
+    
+    if(routingCodeEdittext.text.toString().isNullOrBlank()){
+    routingCodeValue = null
+    }else{
+    routingCodeValue = routingCodeEdittext.text.toString()
+    }
+    
     if(!sortCodeEdittext.text.toString().isNullOrBlank() || !swiftCodeEdittext.text.toString().isNullOrBlank() || !routingCodeEdittext.text.toString().isNullOrBlank()){
     showDialogProgress()
-    branchLookup(sortCodeEdittext.text.toString(), routingCodeEdittext.text.toString(), swiftCodeEdittext.text.toString())
+    branchLookup(sortCodeValue, routingCodeValue, swiftCodeValue)
     }else{
     showMessage("Sort Code Or Routing Code Or Swift Code is required to perform bank search!")
     }
     }
     }
     
-    private fun branchLookup(sort_code: String, routing_code: String, swift_code: String){
+    private fun branchLookup(sort_code: String? = null, routing_code: String? = null, swift_code: String? = null){
     lifecycleScope.launch {
     Remittance.branchLookup(
             sortCode = sort_code,
@@ -161,12 +210,20 @@ private var bic: String = ""
         address = selectedBranch.address
         townName = selectedBranch.town_name ?: ""
         countrySubdivision = selectedBranch.country_subdivision ?: ""
-            
-            destroyFragment()
+        sortClickListener()
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
+    }
+    
+    private fun sortClickListener() {
+    if (bicSwift.isNullOrBlank() || bicSwift.equals(".") || bicSwift.equals("-")) {
+    showMessage("Bic/Swift Code is required!")
+        }else{
+            dismiss()
+            //destroyFragment()
+            }
     }
     
     private fun addRecyclerViewAdapter(response: BranchSearchResponse){
@@ -177,7 +234,7 @@ private var bic: String = ""
 
 private fun showDialogProgress() {
     // Build the AlertDialog
-    dialog = AlertDialog.Builder(requireContext()) // Use requireContext() to get the context
+    dialog = AlertDialog.Builder(requireContext(), R.style.TransparentDialog) // Use requireContext() to get the context
         .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
         .setCancelable(false) // Disable back button dismiss
         .create()
@@ -207,6 +264,10 @@ if (fragment != null) {
 private fun showMessage(message: String) {
     Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
   }
+  
+  override fun getTheme(): Int {
+    return R.style.FullScreenBottomSheetDialog // Use a custom full-screen theme
+}
   
   override fun onDestroyView() {
     super.onDestroyView()

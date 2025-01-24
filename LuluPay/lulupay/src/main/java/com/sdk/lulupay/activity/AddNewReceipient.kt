@@ -17,6 +17,7 @@ import com.sdk.lulupay.database.LuluPayDB
 import com.sdk.lulupay.listeners.*
 import com.sdk.lulupay.model.response.*
 import com.sdk.lulupay.remittance.Remittance
+import com.sdk.lulupay.singleton.ActivityCloseManager
 import com.sdk.lulupay.session.SessionManager
 import com.google.android.material.button.MaterialButton
 import java.math.BigDecimal
@@ -24,23 +25,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import com.sdk.lulupay.bottomsheet.*
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
 data class Country(val name: String, val code: String, val currency: String)
 
-class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
+class AddNewReceipient : AppCompatActivity(), BottomSheetListener, FinishActivityListener {
 
   private lateinit var dialog: AlertDialog
 
   private lateinit var getDetailsBtn: Button
 
   private lateinit var luluPayDB: LuluPayDB
-
-  // Sender Details
-  private lateinit var senderNameEdittext: EditText
-  private lateinit var senderPhoneNoEdittext: EditText
-  private lateinit var senderAddressType: Spinner
-  private lateinit var senderAddressLine: EditText
-  private lateinit var senderTownName: EditText
 
   // Receivers Details
   private lateinit var receiverFirstNameEdittext: EditText
@@ -49,7 +45,6 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private lateinit var receiverPhoneNoEdittext: EditText
   private lateinit var receiverCountrySpinner: Spinner
   private lateinit var receiverReceivingMode: Spinner
-  private lateinit var receiverBankSpinner: Spinner
   private lateinit var receiverAcctType: Spinner
   private lateinit var receiverIbanEdittext: EditText
   private lateinit var receiverAcctNoEdittext: EditText
@@ -62,32 +57,24 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
   // Transaction Details
   private lateinit var instrument: Spinner
-  private lateinit var selectPurpose: Spinner
-  private lateinit var paymentMode: Spinner
-  private lateinit var sourceOfIncome: Spinner
+  private lateinit var correspondentSpinner: Spinner
 
   // Selected Spinner Details
   private var selectedReceivingModeCode: String = ""
+  private var selectedReceivingModeName: String = ""
   private var selectedBank: String = ""
   private var selectedCountryName: String = ""
   private var selectedCountryCode: String = ""
-  private var selectedAddressTypeSender: String = ""
-  private var selectedSenderAddressCountry: String = ""
-  private var selectedSenderAddressCountryCode: String = ""
+  private var selectedCurrencyCode: String = ""
   private var selectedReceiverAcctType: String = ""
   private var selectedInstrument: String = ""
-  private var selectedPurposeOfTXN: String = ""
-  private var selectedPaymentMode: String = ""
-  private var selectedSourceOfIncome: String = ""
+  private var selectedCorrespondent: String = ""
 
   // List CodeNames to use in onItemSelectedListener
   private lateinit var receivingModeList: List<CodeName>
-  private lateinit var addressTypeListSender: List<CodeName>
   private lateinit var acctTypeList: List<CodeName>
   private lateinit var instrumentList: List<CodeName>
-  private lateinit var purposeOfTXNList: List<CodeName>
-  private lateinit var paymentModeList: List<CodeName>
-  private lateinit var sourceOfIncomeList: List<CodeName>
+  private lateinit var correspondentList: List<CodeName>
   private lateinit var bankList: List<BankInfo>
 
   // Details will be use to construct a remittance payload
@@ -124,201 +111,12 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
   private val countries = listOf(
     Country("Choose Country", "", ""),
-    Country("Afghanistan", "AF", "AFN"),
-    Country("Albania", "AL", "ALL"),
-    Country("Algeria", "DZ", "DZD"),
-    Country("Andorra", "AD", "EUR"),
-    Country("Angola", "AO", "AOA"),
-    Country("Antigua and Barbuda", "AG", "XCD"),
-    Country("Argentina", "AR", "ARS"),
-    Country("Armenia", "AM", "AMD"),
-    Country("Australia", "AU", "AUD"),
-    Country("Austria", "AT", "EUR"),
-    Country("Azerbaijan", "AZ", "AZN"),
-    Country("Bahamas", "BS", "BSD"),
-    Country("Bahrain", "BH", "BHD"),
-    Country("Bangladesh", "BD", "BDT"),
-    Country("Barbados", "BB", "BBD"),
-    Country("Belarus", "BY", "BYN"),
-    Country("Belgium", "BE", "EUR"),
-    Country("Belize", "BZ", "BZD"),
-    Country("Benin", "BJ", "XOF"),
-    Country("Bhutan", "BT", "BTN"),
-    Country("Bolivia", "BO", "BOB"),
-    Country("Bosnia and Herzegovina", "BA", "BAM"),
-    Country("Botswana", "BW", "BWP"),
-    Country("Brazil", "BR", "BRL"),
-    Country("Brunei", "BN", "BND"),
-    Country("Bulgaria", "BG", "BGN"),
-    Country("Burkina Faso", "BF", "XOF"),
-    Country("Burundi", "BI", "BIF"),
-    Country("Cabo Verde", "CV", "CVE"),
-    Country("Cambodia", "KH", "KHR"),
-    Country("Cameroon", "CM", "XAF"),
-    Country("Canada", "CA", "CAD"),
-    Country("Central African Republic", "CF", "XAF"),
-    Country("Chad", "TD", "XAF"),
-    Country("Chile", "CL", "CLP"),
     Country("China", "CN", "CNY"),
-    Country("Colombia", "CO", "COP"),
-    Country("Comoros", "KM", "KMF"),
-    Country("Congo (Congo-Brazzaville)", "CG", "XAF"),
-    Country("Congo (DRC)", "CD", "CDF"),
-    Country("Costa Rica", "CR", "CRC"),
-    Country("Croatia", "HR", "HRK"),
-    Country("Cuba", "CU", "CUP"),
-    Country("Cyprus", "CY", "EUR"),
-    Country("Czechia", "CZ", "CZK"),
-    Country("Denmark", "DK", "DKK"),
-    Country("Djibouti", "DJ", "DJF"),
-    Country("Dominica", "DM", "XCD"),
-    Country("Dominican Republic", "DO", "DOP"),
-    Country("Ecuador", "EC", "USD"),
     Country("Egypt", "EG", "EGP"),
-    Country("El Salvador", "SV", "USD"),
-    Country("Equatorial Guinea", "GQ", "XAF"),
-    Country("Eritrea", "ER", "ERN"),
-    Country("Estonia", "EE", "EUR"),
-    Country("Eswatini", "SZ", "SZL"),
-    Country("Ethiopia", "ET", "ETB"),
-    Country("Fiji", "FJ", "FJD"),
-    Country("Finland", "FI", "EUR"),
-    Country("France", "FR", "EUR"),
-    Country("Gabon", "GA", "XAF"),
-    Country("Gambia", "GM", "GMD"),
-    Country("Georgia", "GE", "GEL"),
-    Country("Germany", "DE", "EUR"),
-    Country("Ghana", "GH", "GHS"),
-    Country("Greece", "GR", "EUR"),
-    Country("Grenada", "GD", "XCD"),
-    Country("Guatemala", "GT", "GTQ"),
-    Country("Guinea", "GN", "GNF"),
-    Country("Guinea-Bissau", "GW", "XOF"),
-    Country("Guyana", "GY", "GYD"),
-    Country("Haiti", "HT", "HTG"),
-    Country("Honduras", "HN", "HNL"),
-    Country("Hungary", "HU", "HUF"),
-    Country("Iceland", "IS", "ISK"),
     Country("India", "IN", "INR"),
-    Country("Indonesia", "ID", "IDR"),
-    Country("Iran", "IR", "IRR"),
-    Country("Iraq", "IQ", "IQD"),
-    Country("Ireland", "IE", "EUR"),
-    Country("Israel", "IL", "ILS"),
-    Country("Italy", "IT", "EUR"),
-    Country("Jamaica", "JM", "JMD"),
-    Country("Japan", "JP", "JPY"),
-    Country("Jordan", "JO", "JOD"),
-    Country("Kazakhstan", "KZ", "KZT"),
-    Country("Kenya", "KE", "KES"),
-    Country("Kiribati", "KI", "AUD"),
-    Country("Kuwait", "KW", "KWD"),
-    Country("Kyrgyzstan", "KG", "KGS"),
-    Country("Laos", "LA", "LAK"),
-    Country("Latvia", "LV", "EUR"),
-    Country("Lebanon", "LB", "LBP"),
-    Country("Lesotho", "LS", "LSL"),
-    Country("Liberia", "LR", "LRD"),
-    Country("Libya", "LY", "LYD"),
-    Country("Liechtenstein", "LI", "CHF"),
-    Country("Lithuania", "LT", "EUR"),
-    Country("Luxembourg", "LU", "EUR"),
-    Country("Madagascar", "MG", "MGA"),
-    Country("Malawi", "MW", "MWK"),
-    Country("Malaysia", "MY", "MYR"),
-    Country("Maldives", "MV", "MVR"),
-    Country("Mali", "ML", "XOF"),
-    Country("Malta", "MT", "EUR"),
-    Country("Marshall Islands", "MH", "USD"),
-    Country("Mauritania", "MR", "MRU"),
-    Country("Mauritius", "MU", "MUR"),
-    Country("Mexico", "MX", "MXN"),
-    Country("Micronesia", "FM", "USD"),
-    Country("Moldova", "MD", "MDL"),
-    Country("Monaco", "MC", "EUR"),
-    Country("Mongolia", "MN", "MNT"),
-    Country("Montenegro", "ME", "EUR"),
-    Country("Morocco", "MA", "MAD"),
-    Country("Mozambique", "MZ", "MZN"),
-    Country("Myanmar", "MM", "MMK"),
-    Country("Namibia", "NA", "NAD"),
-    Country("Nauru", "NR", "AUD"),
-    Country("Nepal", "NP", "NPR"),
-    Country("Netherlands", "NL", "EUR"),
-    Country("New Zealand", "NZ", "NZD"),
-    Country("Nicaragua", "NI", "NIO"),
-    Country("Niger", "NE", "XOF"),
-    Country("Nigeria", "NG", "NGN"),
-    Country("North Korea", "KP", "KPW"),
-    Country("North Macedonia", "MK", "MKD"),
-    Country("Norway", "NO", "NOK"),
-    Country("Oman", "OM", "OMR"),
     Country("Pakistan", "PK", "PKR"),
-    Country("Palau", "PW", "USD"),
-    Country("Palestine", "PS", "ILS"),
-    Country("Panama", "PA", "PAB"),
-    Country("Papua New Guinea", "PG", "PGK"),
-    Country("Paraguay", "PY", "PYG"),
-    Country("Peru", "PE", "PEN"),
     Country("Philippines", "PH", "PHP"),
-    Country("Poland", "PL", "PLN"),
-    Country("Portugal", "PT", "EUR"),
-    Country("Qatar", "QA", "QAR"),
-    Country("Romania", "RO", "RON"),
-    Country("Russia", "RU", "RUB"),
-    Country("Rwanda", "RW", "RWF"),
-    Country("Saint Kitts and Nevis", "KN", "XCD"),
-    Country("Saint Lucia", "LC", "XCD"),
-    Country("Saint Vincent and the Grenadines", "VC", "XCD"),
-    Country("Samoa", "WS", "WST"),
-    Country("San Marino", "SM", "EUR"),
-    Country("Sao Tome and Principe", "ST", "STN"),
-    Country("Saudi Arabia", "SA", "SAR"),
-    Country("Senegal", "SN", "XOF"),
-    Country("Serbia", "RS", "RSD"),
-    Country("Seychelles", "SC", "SCR"),
-    Country("Sierra Leone", "SL", "SLL"),
-    Country("Singapore", "SG", "SGD"),
-    Country("Slovakia", "SK", "EUR"),
-    Country("Slovenia", "SI", "EUR"),
-    Country("Solomon Islands", "SB", "SBD"),
-    Country("Somalia", "SO", "SOS"),
-    Country("South Africa", "ZA", "ZAR"),
-    Country("South Korea", "KR", "KRW"),
-    Country("South Sudan", "SS", "SSP"),
-    Country("Spain", "ES", "EUR"),
-    Country("Sri Lanka", "LK", "LKR"),
-    Country("Sudan", "SD", "SDG"),
-    Country("Suriname", "SR", "SRD"),
-    Country("Sweden", "SE", "SEK"),
-    Country("Switzerland", "CH", "CHF"),
-    Country("Syria", "SY", "SYP"),
-    Country("Taiwan", "TW", "TWD"),
-    Country("Tajikistan", "TJ", "TJS"),
-    Country("Tanzania", "TZ", "TZS"),
-    Country("Thailand", "TH", "THB"),
-    Country("Timor-Leste", "TL", "USD"),
-    Country("Togo", "TG", "XOF"),
-    Country("Tonga", "TO", "TOP"),
-    Country("Trinidad and Tobago", "TT", "TTD"),
-    Country("Tunisia", "TN", "TND"),
-    Country("Turkey", "TR", "TRY"),
-    Country("Turkmenistan", "TM", "TMT"),
-    Country("Tuvalu", "TV", "AUD"),
-    Country("Uganda", "UG", "UGX"),
-    Country("Ukraine", "UA", "UAH"),
-    Country("United Arab Emirates", "AE", "AED"),
-    Country("United Kingdom", "GB", "GBP"),
-    Country("United States", "US", "USD"),
-    Country("Uruguay", "UY", "UYU"),
-    Country("Uzbekistan", "UZ", "UZS"),
-    Country("Vanuatu", "VU", "VUV"),
-    Country("Vatican City", "VA", "EUR"),
-    Country("Venezuela", "VE", "VES"),
-    Country("Vietnam", "VN", "VND"),
-    Country("Yemen", "YE", "YER"),
-    Country("Zambia", "ZM", "ZMW"),
-    Country("Zimbabwe", "ZW", "ZWL")
+    Country("Sri Lanka", "LK", "LKR")
 )
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -326,18 +124,21 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     setContentView(R.layout.add_new_receipient)
 
     luluPayDB = LuluPayDB(this)
-
+    
+    registerListeners()
     setupViews()
+  }
+  
+  private fun registerListeners(){
+    ActivityCloseManager.registerListener(this)
+  }
+  
+  private fun destroyListeners(){
+   ActivityCloseManager.unregisterListener(this) // Avoid memory leaks
   }
 
   private fun setupViews() {
     getDetailsBtn = findViewById(R.id.get_details_btn)
-
-    senderNameEdittext = findViewById(R.id.sender_name)
-    senderPhoneNoEdittext = findViewById(R.id.sender_phone_no)
-    senderAddressType = findViewById(R.id.address_type)
-    senderAddressLine = findViewById(R.id.address_line)
-    senderTownName = findViewById(R.id.town_name)
 
     receiverFirstNameEdittext = findViewById(R.id.receiver_first_name)
     receiverMiddleNameEdittext = findViewById(R.id.receiver_middle_name)
@@ -345,7 +146,6 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     receiverPhoneNoEdittext = findViewById(R.id.receiver_phone_no)
     receiverCountrySpinner = findViewById(R.id.receiver_country)
     receiverReceivingMode = findViewById(R.id.receiver_mode)
-    receiverBankSpinner = findViewById(R.id.receiver_bank)
     receiverAcctType = findViewById(R.id.receiver_acct_type)
     receiverIbanEdittext = findViewById(R.id.receiver_iban)
     receiverAcctNoEdittext = findViewById(R.id.receiver_acct_no)
@@ -357,9 +157,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     receiverCountrySubdivisionEdittext = findViewById(R.id.receiver_country_subdivision)
 
     instrument = findViewById(R.id.instrument)
-    selectPurpose = findViewById(R.id.select_purpose)
-    paymentMode = findViewById(R.id.payment_mode)
-    sourceOfIncome = findViewById(R.id.source_of_income)
+    correspondentSpinner = findViewById(R.id.correspondent)
 
     addCountriesSpinner()
 
@@ -367,43 +165,13 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     registerSpinnerListeners()
     showDialogProgress()
     getReceiveingModes()
-    getPurposeOfTXN()
-    getPaymentMode()
-    getSourceOfIncome()
     getAccountType()
-    getAddressType()
     getInstruments()
     showMessage("Fetching required data please wait!")
   }
 
   private fun registerSpinnerListeners() {
     receiverCountrySpinner.onItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-          override fun onItemSelected(
-              parent: AdapterView<*>,
-              view: View?,
-              position: Int,
-              id: Long
-          ) {
-          countryPosition = position
-            val selectedCountry = countries[position]
-            selectedCountryName = selectedCountry.name
-            selectedCountryCode = selectedCountry.code
-            val currencyCode = selectedCountry.currency
-            hideViews()
-
-            if (!selectedReceivingModeCode.isNullOrBlank() && !selectedCountryName.equals("Choose Country") && receivingPosition != 0) {
-              showDialogProgress()
-              getServiceCorridor()
-            }
-          }
-
-          override fun onNothingSelected(parent: AdapterView<*>) {
-            // Handle the case where nothing is selected
-          }
-        }
-
-    receiverReceivingMode.onItemSelectedListener =
     object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(
             parent: AdapterView<*>,
@@ -411,45 +179,61 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
             position: Int,
             id: Long
         ) {
-        
-        receivingPosition = position
-        hideViews()
-            if (position in receivingModeList.indices) { // Ensure valid position
-                val selectedMode = receivingModeList[position]
-                selectedReceivingModeCode = selectedMode.code
+            countryPosition = position
+            hideViews()
+             
+            if(position == 0){
+            return
+            }
+            
+            val selectedCountry = countries.getOrNull(position) // Safely get the country
+            selectedCountryName = selectedCountry?.name.orEmpty() // Avoid nulls
+            selectedCountryCode = selectedCountry?.code.orEmpty()
+            selectedCurrencyCode = selectedCountry?.currency.orEmpty()
 
-                if (!selectedCountryName.equals("Choose Country") && !selectedReceivingModeCode.isNullOrBlank() && countryPosition != 0) {
-                    showDialogProgress()
-                    getServiceCorridor()
-                }
+            // Check conditions and ensure none are null or invalid
+            if (position >= 1 && receivingPosition >= 1) {
+                showDialogProgress()
+                getServiceCorridor()
+            }
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>) {
+            // Handle the case where nothing is selected
+        }
+    }
+
+receiverReceivingMode.onItemSelectedListener =
+    object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(
+            parent: AdapterView<*>,
+            view: View?,
+            position: Int,
+            id: Long
+        ) {
+            receivingPosition = position
+            hideViews()
+            
+             
+         if(position == 0){
+         selectedReceivingModeCode = ""
+         selectedReceivingModeName = ""
+            return
+            }else if(position - 1 in receivingModeList.indices){
+            
+            selectedReceivingModeCode = receivingModeList[position - 1].code
+            selectedReceivingModeName = receivingModeList[position - 1].name
+            
+          }
+
+            if (position >= 1 && countryPosition >= 1) {
+                showDialogProgress()
+                getServiceCorridor()
             }
         }
 
         override fun onNothingSelected(parent: AdapterView<*>) {
             // Handle case where nothing is selected
-        }
-    }
-
-    senderAddressType.onItemSelectedListener =
-    object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
-            parent: AdapterView<*>,
-            view: View?,
-            position: Int,
-            id: Long
-        ) {
-            if (position == 0) {
-                // Default item selected, clear selection
-                selectedAddressTypeSender = ""
-            } else if (position - 1 in addressTypeListSender.indices) {
-                // Adjust for the "Choose Address Type" offset
-                val selected = addressTypeListSender[position - 1]
-                selectedAddressTypeSender = selected.code
-            }
-        }
-
-        override fun onNothingSelected(parent: AdapterView<*>) {
-            selectedAddressTypeSender = ""
         }
     }
 
@@ -461,8 +245,12 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
             position: Int,
             id: Long
         ) {
-            if (position in acctTypeList.indices) { // Ensure valid position
-                val selected = acctTypeList[position]
+        if(position == 0){
+        selectedReceiverAcctType = ""
+        return
+        }
+            if (position - 1 in acctTypeList.indices) { // Ensure valid position
+                val selected = acctTypeList[position - 1]
                 selectedReceiverAcctType = selected.code
             }
         }
@@ -480,8 +268,12 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
             position: Int,
             id: Long
         ) {
-            if (position in instrumentList.indices) { // Ensure valid position
-                val selected = instrumentList[position]
+        if(position == 0){
+        selectedInstrument = ""
+        return
+        }
+            if (position - 1 in instrumentList.indices) { // Ensure valid position
+                val selected = instrumentList[position - 1]
                 selectedInstrument = selected.code
             }
         }
@@ -490,8 +282,8 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
             // Handle case where nothing is selected
         }
     }
-
-    selectPurpose.onItemSelectedListener =
+    
+    correspondentSpinner.onItemSelectedListener =
     object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(
             parent: AdapterView<*>,
@@ -499,47 +291,13 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
             position: Int,
             id: Long
         ) {
-            if (position in purposeOfTXNList.indices) { // Ensure valid position
-                val selected = purposeOfTXNList[position]
-                selectedPurposeOfTXN = selected.code
-            }
+        if(position == 0){
+        selectedCorrespondent = ""
+        return
         }
-
-        override fun onNothingSelected(parent: AdapterView<*>) {
-            // Handle case where nothing is selected
-        }
-    }
-
-    paymentMode.onItemSelectedListener =
-    object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
-            parent: AdapterView<*>,
-            view: View?,
-            position: Int,
-            id: Long
-        ) {
-            if (position in paymentModeList.indices) { // Ensure valid position
-                val selected = paymentModeList[position]
-                selectedPaymentMode = selected.code
-            }
-        }
-
-        override fun onNothingSelected(parent: AdapterView<*>) {
-            // Handle case where nothing is selected
-        }
-    }
-
-    sourceOfIncome.onItemSelectedListener =
-    object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(
-            parent: AdapterView<*>,
-            view: View?,
-            position: Int,
-            id: Long
-        ) {
-            if (position in sourceOfIncomeList.indices) { // Ensure valid position
-                val selected = sourceOfIncomeList[position]
-                selectedSourceOfIncome = selected.code
+            if (position - 1 in correspondentList.indices) { // Ensure valid position
+                val selected = correspondentList[position - 1]
+                selectedCorrespondent = selected.code
             }
         }
 
@@ -550,7 +308,8 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   }
 
   private fun showViews() {
-  if(selectedCountryCode.equals("EG") || selectedCountryCode.equals("PK") || selectedCountryCode.equals("UK") || selectedCountryCode.equals("AE")){
+  // For pakistan country on what view to display
+  if(selectedCountryCode.equals("PK") || selectedCountryCode.equals("EG") || selectedCountryCode.equals("LK")){
   
   if (receiverAcctNoEdittext.visibility == View.VISIBLE) {
       receiverAcctNoEdittext.visibility = View.GONE
@@ -569,10 +328,44 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
       receiverIbanEdittext.visibility = View.GONE
     }
   }
-    if (receiverBankSpinner.visibility == View.GONE) {
-      receiverBankSpinner.visibility = View.VISIBLE
+  
+  // For India Receipient on what view to display
+  if(selectedCountryCode.equals("IN")){
+    if(receiverIsoCodeEdittext.visibility == View.VISIBLE){
+    receiverIsoCodeEdittext.visibility = View.GONE
     }
-
+    
+    if(receiverIsoCodeEdittext.isEnabled){
+        receiverIsoCodeEdittext.isEnabled = false
+    }
+    
+    if(receiverRoutingCodeEdittext.visibility == View.GONE){
+    receiverRoutingCodeEdittext.visibility = View.VISIBLE
+    }
+    
+    if(!receiverRoutingCodeEdittext.isEnabled){
+        receiverRoutingCodeEdittext.isEnabled = true
+    }
+    
+  }else{
+    if(receiverIsoCodeEdittext.visibility == View.GONE){
+    receiverIsoCodeEdittext.visibility = View.VISIBLE
+    }
+    
+    if(!receiverIsoCodeEdittext.isEnabled){
+        receiverIsoCodeEdittext.isEnabled = true
+    }
+    
+    if(receiverRoutingCodeEdittext.visibility == View.VISIBLE){
+    receiverRoutingCodeEdittext.visibility = View.GONE
+    }
+    
+    if(receiverRoutingCodeEdittext.isEnabled){
+        receiverRoutingCodeEdittext.isEnabled = false
+    }
+  }
+  
+   // For All Country
     if (receiverAcctType.visibility == View.GONE) {
       receiverAcctType.visibility = View.VISIBLE
     }
@@ -580,18 +373,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     if (instrument.visibility == View.GONE) {
       instrument.visibility = View.VISIBLE
     }
-
-    if (selectPurpose.visibility == View.GONE) {
-      selectPurpose.visibility = View.VISIBLE
-    }
-
-    if (paymentMode.visibility == View.GONE) {
-      paymentMode.visibility = View.VISIBLE
-    }
-
-    if (sourceOfIncome.visibility == View.GONE) {
-      sourceOfIncome.visibility = View.VISIBLE
-    }
+    
   }
   
   private fun hideViews() {
@@ -603,10 +385,6 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
       receiverIbanEdittext.visibility = View.GONE
     }
     
-    if (receiverBankSpinner.visibility == View.VISIBLE) {
-      receiverBankSpinner.visibility = View.GONE
-    }
-
     if (receiverAcctType.visibility == View.VISIBLE) {
       receiverAcctType.visibility = View.GONE
     }
@@ -614,33 +392,43 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
     if (instrument.visibility == View.VISIBLE) {
       instrument.visibility = View.GONE
     }
-
-    if (selectPurpose.visibility == View.VISIBLE) {
-      selectPurpose.visibility = View.GONE
+    
+    if (correspondentSpinner.visibility == View.VISIBLE) {
+      correspondentSpinner.visibility = View.GONE
     }
-
-    if (paymentMode.visibility == View.VISIBLE) {
-      paymentMode.visibility = View.GONE
-    }
-
-    if (sourceOfIncome.visibility == View.VISIBLE) {
-      sourceOfIncome.visibility = View.GONE
-    }
+    
+    if(receiverAddressEdittext.visibility == View.VISIBLE){
+     receiverAddressEdittext.visibility = View.GONE
+     }
+     
+    if(receiverTownNameEdittext.visibility == View.VISIBLE){
+     receiverTownNameEdittext.visibility = View.GONE
+     }
+     
+     if(receiverCountrySubdivisionEdittext.visibility == View.VISIBLE){
+     receiverCountrySubdivisionEdittext.visibility = View.GONE
+     }
+    
+    receiverIsoCodeEdittext.isEnabled = false
   }
 
-  private fun getBankList(countryCode: String) {
+  private fun getBankList() {
     lifecycleScope.launch {
         Remittance.getBankMaster(
             countryCode = selectedCountryCode,
             receivingMode = selectedReceivingModeCode,
-            partnerName = senderNameEdittext.text.toString(),
+            partnerName = SessionManager.username ?: "",
             object : BankMasterListener {
               override fun onSuccess(response: MasterBankResponse) {
                 addBanksSpinner(response)
               }
 
               override fun onFailed(errorMessage: String) {
-                showMessage("Error: $errorMessage")
+                if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
                 hideViews()
               }
             })
@@ -672,7 +460,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getServiceCorridor() {
     lifecycleScope.launch {
         Remittance.getServiceCorridor(
-            partnerName = senderNameEdittext.text.toString(),
+            partnerName = SessionManager.username ?: "",
             receiving_mode = selectedReceivingModeCode,
             receiving_country_code = selectedCountryCode,
             listener =
@@ -685,7 +473,11 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
                   override fun onFailed(errorMessage: String) {
                     dismissDialogProgress()
-                    showMessage(errorMessage)
+                    if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
                     hideViews()
                   }
                 })
@@ -695,7 +487,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getReceiveingModes() {
     lifecycleScope.launch {
         Remittance.getReceivingModes(
-            senderNameEdittext.text.toString(),
+            SessionManager.username ?: "",
             object : ReceiveModeListener {
               override fun onSuccess(response: CodeResponse) {
                 addReceivingModeSpinner(response)
@@ -703,58 +495,11 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
+                if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
                 showMessage(errorMessage)
-              }
-            })
-    }
-  }
-
-  private fun getPurposeOfTXN() {
-    lifecycleScope.launch {
-        Remittance.getPurposeOfTXN(
-            senderNameEdittext.text.toString(),
-            object : PurposeOfTXNListener {
-              override fun onSuccess(response: CodeResponse) {
-                addPurposeOfTXNSpinner(response)
-              }
-
-              override fun onFailed(errorMessage: String) {
-                showMessage(errorMessage)
-                dismissDialogProgress()
-              }
-            })
-    }
-  }
-
-  private fun getPaymentMode() {
-    lifecycleScope.launch {
-        Remittance.getPaymentMode(
-            senderNameEdittext.text.toString(),
-            object : PaymentModeListener {
-              override fun onSuccess(response: CodeResponse) {
-                addPaymentModeSpinner(response)
-              }
-
-              override fun onFailed(errorMessage: String) {
-                dismissDialogProgress()
-                showMessage(errorMessage + "3")
-              }
-            })
-      }
-    }
-
-  private fun getSourceOfIncome() {
-    lifecycleScope.launch {
-        Remittance.getSourceOfIncome(
-            senderNameEdittext.text.toString(),
-            object : SourceOfIncomeListener {
-              override fun onSuccess(response: CodeResponse) {
-                addSourceOfIncomeSpinner(response)
-              }
-
-              override fun onFailed(errorMessage: String) {
-                dismissDialogProgress()
-                showMessage(errorMessage + "2")
+                }
               }
             })
     }
@@ -763,15 +508,21 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getCorrespondent() {
     lifecycleScope.launch {
         Remittance.getCorrespondent(
-            senderNameEdittext.text.toString(),
+            SessionManager.username ?: "",
             object : CorrespondentListener {
               override fun onSuccess(response: CodeResponse) {
-                // addCorrespondentSpinner(response)
+                 addCorrespondentSpinner(response)
+                 dismissDialogProgress()
+                 showViews()
               }
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
+                if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
                 showMessage(errorMessage)
+                }
               }
             })
     }
@@ -780,7 +531,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getAccountType() {
     lifecycleScope.launch {
         Remittance.getAccountType(
-            senderNameEdittext.text.toString(),
+            SessionManager.username ?: "",
             object : AccountTypeListener {
                 override fun onSuccess(response: CodeResponse) {
                     addAcctTypeSpinner(response)
@@ -788,7 +539,11 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
                 override fun onFailed(errorMessage: String) {
                     dismissDialogProgress()
-                        showMessage(errorMessage) // Show toast or any UI-related action
+                    if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
                 }
             })
 }
@@ -797,15 +552,19 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getAddressType() {
     lifecycleScope.launch {
         Remittance.getAddressType(
-            senderNameEdittext.text.toString(),
+            SessionManager.username ?: "",
             object : AddressTypeListener {
               override fun onSuccess(response: CodeResponse) {
-                addAddressTypeSpinnerSender(response)
+                
               }
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
+                if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
                 showMessage(errorMessage)
+                }
               }
             })
     }
@@ -814,7 +573,7 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
   private fun getInstruments() {
     lifecycleScope.launch {
         Remittance.getInstruments(
-            senderNameEdittext.text.toString(),
+            SessionManager.username ?: "",
             object : InstrumentListener {
               override fun onSuccess(response: CodeResponse) {
                 addInstrumentSpinner(response)
@@ -823,42 +582,27 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener {
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
-                showMessage(errorMessage + "1")
+                if(isLikelyJson(errorMessage)){
+                extractErrorMessageData(errorMessage)
+                }else{
+                showMessage(errorMessage)
+                }
               }
             })
     }
   }
   
-  private fun routingCodeLookup(routing_code: String){
-  lifecycleScope.launch {
-  
-  }
-  }
-  
-  private fun isoCodeLookup(iso_code: String){
-  lifecycleScope.launch {
-  
-  }
-  }
-  
-  private fun sortCodeLookup(sort: String){
-  lifecycleScope.launch {
-  
-  }
-  }
-
   private fun registerClickListeners() {
   searchBankButton.setOnClickListener{
   if(!selectedReceivingModeCode.isNullOrBlank()){
   if(!selectedCountryCode.isNullOrBlank()){
-  if(!senderNameEdittext.text.toString().isNullOrBlank()){
+  
+  // Opens BottomSheetFragment to search for available banks for cash pickup or mobile wallet
   val bottomSheet = BottomSheetLookupsFragment.newInstance(receivingMode = selectedReceivingModeCode,
-  sender = senderNameEdittext.text.toString(),
+  receivingName = selectedReceivingModeName,
+  sender = SessionManager.username ?: "",
   country = selectedCountryCode)
 bottomSheet.show(supportFragmentManager, "BottomSheet")
-}else{
-showMessage("Sender Name is required!")
-}
 }else{
 showMessage("Receiver Country is required!")
 }
@@ -867,11 +611,8 @@ showMessage("Receiving Mode is required!")
 }
   }
   
+  // This checks all input to validate account
     getDetailsBtn.setOnClickListener {
-      val senderName: String = senderNameEdittext.text.toString()
-      val senderPhoneNo: String = senderPhoneNoEdittext.text.toString()
-      val senderAddressLineValue: String = senderAddressLine.text.toString()
-      val senderTownNameValue: String = senderTownName.text.toString()
       val receiverFirstName: String = receiverFirstNameEdittext.text.toString()
       val receiverMiddleName: String = receiverMiddleNameEdittext.text.toString()
       val receiverLastName: String = receiverLastNameEdittext.text.toString()
@@ -880,13 +621,6 @@ showMessage("Receiving Mode is required!")
       val receiverIban: String = receiverIbanEdittext.text.toString()
       
       
-
-      if (!senderName.isNullOrEmpty()) {
-        if (!senderPhoneNo.isNullOrEmpty()) {
-          if (isValidPhoneNumber(senderPhoneNo)) {
-            if (!selectedAddressTypeSender.isNullOrEmpty()) {
-              if (!senderAddressLineValue.isNullOrEmpty()) {
-                if (!senderTownNameValue.isNullOrEmpty()) {
                   if (!receiverFirstName.isNullOrEmpty()) {
                     if (!receiverMiddleName.isNullOrEmpty()) {
                       if (!receiverLastName.isNullOrEmpty()) {
@@ -895,75 +629,26 @@ showMessage("Receiving Mode is required!")
                             if (!receiverAcctNo.isNullOrEmpty() || !receiverIban.isNullOrEmpty()) {
                               if (!selectedCountryCode.isNullOrEmpty()) {
                                 if (!selectedReceivingModeCode.isNullOrEmpty()) {
-                                  if (!selectedBank.isNullOrEmpty()) {
-                                    if (!selectedReceiverAcctType.isNullOrBlank()) {
+                                    if (!selectedReceiverAcctType.isNullOrBlank() || !selectedReceiverAcctType.isNullOrEmpty()) {
                                       if (!selectedInstrument.isNullOrEmpty()) {
-                                        if (!selectedPurposeOfTXN.isNullOrEmpty()) {
-                                          if (!selectedPaymentMode.isNullOrEmpty()) {
-                                            if (!selectedSourceOfIncome.isNullOrEmpty()) {
-                                            if(!routingCode.isNullOrEmpty()){
-                                            if(!isoCode.isNullOrEmpty()){
-                                            if(!sort.isNullOrEmpty()){
-                                            if(!address.isNullOrEmpty() || !receiverAddressEdittext.text.toString().isNullOrEmpty()){
-                                            if(!townName.isNullOrEmpty() || !receiverTownNameEdittext.text.toString().isNullOrEmpty()){
-                                            if(!countrySubdivision.isNullOrEmpty() || !receiverCountrySubdivisionEdittext.text.toString().isNullOrEmpty()){
-                                              SessionManager.partnerName = senderName
-                                              iban = receiverIbanEdittext.text.toString() ?: ""
+                                            if(!receiverIsoCodeEdittext.text.toString().isNullOrEmpty() || !receiverRoutingCodeEdittext.text.toString().isNullOrEmpty()){
+                                              SessionManager.partnerName = SessionManager.username ?: ""
+                                              iban = receiverIbanEdittext?.text.toString() ?: ""
+                                              isoCode = receiverIsoCodeEdittext.text.toString()
+                                              routingCode = receiverRoutingCodeEdittext?.text.toString() ?: ""
                                               
-                                              if(address.isNullOrBlank() || address.equals(".")){
-                                              address = receiverAddressEdittext.text.toString()
-                                              }
-                                              
-                                              if(townName.isNullOrBlank() || townName.equals(".")){
-                                              townName = receiverTownNameEdittext.text.toString()
-                                              }
-                                              
-                                              if(countrySubdivision.isNullOrBlank() || countrySubdivision.equals(".")){
-                                              countrySubdivision = receiverCountrySubdivisionEdittext.text.toString()
-                                              }
                                               showDialogProgress()
-                                              showMessage("Validating Inputs")
-                                              validateAccount(
-                                                  receiverFirstName,
-                                                  receiverMiddleName,
-                                                  receiverLastName,
-                                                  receiverAcctNo)
+                                              validateAccount(receiverFirstName, receiverMiddleName, receiverLastName, receiverAcctNo)
+                                              
                                                   }else{
-                                                  showMessage("Receiver Resident Country Subdivision is required!")
+                                                  showMessage("Receiver Bic/Swift Code or Routing Code is required!")
                                                   }
-                                                  }else{
-                                                  showMessage("Receiver Resident Town Name is required!")
-                                                  }
-                                                  }else{
-                                                  showMessage("Receiver Resident Address Line is required!")
-                                                  }
-                                                  }else{
-                                                  showMessage("Receiver Sort or Swift Code is required!")
-                                                  }
-                                                  }else{
-                                                  showMessage("Receiver Iso Code is required!")
-                                                  }
-                                                  }else{
-                                                  showMessage("Receiver Routing Code is required!")
-                                                  }
-                                            } else {
-                                              showMessage("Source Of Income is required!")
-                                            }
-                                          } else {
-                                            showMessage("Payment Mode is required!")
-                                          }
-                                        } else {
-                                          showMessage("Purpose Of Transaction is required!")
-                                        }
                                       } else {
                                         showMessage("Instrument is required!")
                                       }
                                     } else {
                                       showMessage("Receiver Account Type is required!")
                                     }
-                                  } else {
-                                    showMessage("Receiver Bank is required!")
-                                  }
                                 } else {
                                   showMessage("Receiver Receiving Mode is required")
                                 }
@@ -988,32 +673,18 @@ showMessage("Receiving Mode is required!")
                   } else {
                     showMessage("Receiver First Name is required!")
                   }
-                } else {
-                  showMessage("Sender Bank Address Town Name is required!")
-                }
-              } else {
-                showMessage("Sender Bank Address Line is required!")
-              }
-            } else {
-              showMessage("Sender Bank Address Type is required!")
-            }
-          } else {
-            showMessage("Sender Phone Number is invalid!")
-          }
-        } else {
-          showMessage("Sender Phone Number is required!")
-        }
-      } else {
-        showMessage("Sender name is required!")
-      }
     }
   }
 
-  fun isValidPhoneNumber(phoneNo: String): Boolean {
+  private fun isValidPhoneNumber(phoneNo: String): Boolean {
     val phoneNumber = phoneNo
     val phoneNumberRegex = Regex("^(\\+|0)[0-9]{3,15}$")
     return phoneNumberRegex.matches(phoneNumber)
   }
+  
+  private fun isLikelyJson(input: String): Boolean {
+    return input.trimStart().startsWith('{') || input.trimStart().startsWith('[')
+}
 
   private fun addCountriesSpinner() {
     val adapter =
@@ -1031,6 +702,16 @@ showMessage("Receiving Mode is required!")
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
     receiverReceivingMode.adapter = adapter
   }
+  
+  private fun addCorrespondentSpinner(response: CodeResponse){
+  correspondentList = response.data.correspondents
+  val correspondentName = mutableListOf("Choose Your Bank Correspondent") // Add the default first string
+    correspondentName.addAll(correspondentList.map { it.name }) // Append the rest of the items
+
+    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, correspondentName)
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    correspondentSpinner.adapter = adapter
+  }
 
   private fun addBanksSpinner(response: MasterBankResponse) {
     bankList = response.data.list
@@ -1042,7 +723,7 @@ showMessage("Receiving Mode is required!")
     // Set up the Spinner with the list of bank names
     val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, bankNames)
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    receiverBankSpinner.adapter = adapter
+   // receiverBankSpinner.adapter = adapter
   }
 
   private fun sortServiceCorridorResponse(response: ServiceCorridorResponse) {
@@ -1060,8 +741,8 @@ showMessage("Receiving Mode is required!")
 
     val corridorCurrency = remittanceDetail.corridor_currencies.firstOrNull()
     correspondent = corridorCurrency?.correspondent ?: "Unknown"
-    sendingCurrencyCode = corridorCurrency?.sending_currency_code ?: "Unknown"
-    receivingCurrencyCode = corridorCurrency?.receiving_currency_code ?: "Unknown"
+    sendingCurrencyCode = corridorCurrency?.sending_currency_code ?: "AED"
+    receivingCurrencyCode = corridorCurrency?.receiving_currency_code ?: selectedCurrencyCode
     correspondentName = corridorCurrency?.correspondent_name ?: "Unknown"
   }
 
@@ -1146,36 +827,6 @@ showMessage("Receiving Mode is required!")
     }
   }
 
-  private fun addPurposeOfTXNSpinner(response: CodeResponse) {
-    purposeOfTXNList = response.data.purposes_of_transactions
-    val purposeOfTXNName = mutableListOf("Choose Purpose Of Transaction") // Default string
-    purposeOfTXNName.addAll(purposeOfTXNList.map { it.name }) // Append the rest
-
-    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, purposeOfTXNName)
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    selectPurpose.adapter = adapter
-  }
-
-  private fun addPaymentModeSpinner(response: CodeResponse) {
-    paymentModeList = response.data.payment_modes
-    val paymentModeName = mutableListOf("Choose Payment Mode") // Default string
-    paymentModeName.addAll(paymentModeList.map { it.name }) // Append the rest
-
-    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, paymentModeName)
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    paymentMode.adapter = adapter
-  }
-
-  private fun addSourceOfIncomeSpinner(response: CodeResponse) {
-    sourceOfIncomeList = response.data.sources_of_incomes
-    val sourceOfIncomeName = mutableListOf("Choose Source Of Income") // Default string
-    sourceOfIncomeName.addAll(sourceOfIncomeList.map { it.name }) // Append the rest
-
-    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, sourceOfIncomeName)
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    sourceOfIncome.adapter = adapter
-  }
-
   private fun addAcctTypeSpinner(response: CodeResponse) {
     acctTypeList = response.data.account_types
     val acctTypeName = mutableListOf("Choose Account Type") // Default string
@@ -1184,16 +835,6 @@ showMessage("Receiving Mode is required!")
     val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, acctTypeName)
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
     receiverAcctType.adapter = adapter
-  }
-
-  private fun addAddressTypeSpinnerSender(response: CodeResponse) {
-    addressTypeListSender = response.data.address_types
-    val addressTypeName = mutableListOf("Choose Address Type") // Default string
-    addressTypeName.addAll(addressTypeListSender.map { it.name }) // Append the rest
-
-    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, addressTypeName)
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    senderAddressType.adapter = adapter
   }
 
   private fun addInstrumentSpinner(response: CodeResponse) {
@@ -1213,65 +854,108 @@ showMessage("Receiving Mode is required!")
       accountNo: String
   ) {
     lifecycleScope.launch {
-    if(receivingCountryCode.equals("UK") || receivingCountryCode.equals("EG") || receivingCountryCode.equals("PK") || receivingCountryCode.equals("AE")){
+    if(receivingMode.contains("BANK")){
+    // For receiving mode with bank transfer
+    if(receivingCountryCode.equals("IN")){
+    // For countries that accept routing code and account number
     Remittance.validateAccount(
-            partnerName = senderNameEdittext.text.toString(),
-            correspondent = correspondent,
+            partnerName = SessionManager.username ?: "",
             receiving_country_code = receivingCountryCode,
             receiving_mode = receivingMode,
-            iso_code = isoCode,
-            routing_code = null,
-            sort_code = null,
-            iban = iban,
-            bank_id = bankId,
-            branch_id = branchId,
+            swiftCode = null,
+            routingCode = routingCode,
+            iban = null,
+            acct_no = accountNo,
             first_name = firstName,
             middle_name = middleName,
             last_name = lastName,
-            account_number = null,
             object : ValidateAccountListener {
               override fun onSuccess(response: AccountValidationResponse) {
-                sortValidateAccountResponse(response)
+                sortValidateAccountResponse(response, firstName, middleName, lastName, accountNo)
               }
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
-                showMessage(errorMessage)
+                extractErrorMessageData(errorMessage)
+              }
+            })
+    }else if(receivingCountryCode.equals("EG") || receivingCountryCode.equals("PK") || receivingCountryCode.equals("LK")){
+    // For countries that accept isoCode(BIC/SWIFT CODE) and iban
+    Remittance.validateAccount(
+            partnerName = SessionManager.username ?: "",
+            receiving_country_code = receivingCountryCode,
+            receiving_mode = receivingMode,
+            swiftCode = isoCode,
+            routingCode = null,
+            iban = iban,
+            acct_no = null,
+            first_name = firstName,
+            middle_name = middleName,
+            last_name = lastName,
+            object : ValidateAccountListener {
+              override fun onSuccess(response: AccountValidationResponse) {
+                sortValidateAccountResponse(response, firstName, middleName, lastName, accountNo)
+              }
+
+              override fun onFailed(errorMessage: String) {
+                dismissDialogProgress()
+                extractErrorMessageData(errorMessage)
               }
             })
     }else{
+    // For countries that accept isocode(Bic/Swift Code) and account number
         Remittance.validateAccount(
-            partnerName = senderNameEdittext.text.toString(),
-            correspondent = correspondent,
+            partnerName = SessionManager.username ?: "",
             receiving_country_code = receivingCountryCode,
             receiving_mode = receivingMode,
-            iso_code = isoCode,
-            routing_code = null,
-            sort_code = null,
+            swiftCode = isoCode,
+            routingCode = null,
             iban = null,
-            bank_id = bankId,
-            branch_id = branchId,
+            acct_no = accountNo,
             first_name = firstName,
             middle_name = middleName,
             last_name = lastName,
-            account_number = accountNo,
             object : ValidateAccountListener {
               override fun onSuccess(response: AccountValidationResponse) {
-                sortValidateAccountResponse(response)
+                sortValidateAccountResponse(response, firstName, middleName, lastName, accountNo)
               }
 
               override fun onFailed(errorMessage: String) {
                 dismissDialogProgress()
-                showMessage(errorMessage)
+                extractErrorMessageData(errorMessage)
+              }
+            })
+            }
+            }else{
+            // For receiving mode with Cash pickup or Mobile wallet
+            Remittance.validateAccount(
+            partnerName = SessionManager.username ?: "",
+            receiving_country_code = receivingCountryCode,
+            receiving_mode = receivingMode,
+            swiftCode = isoCode,
+            routingCode = null,
+            iban = null,
+            acct_no = null,
+            first_name = firstName,
+            middle_name = middleName,
+            last_name = lastName,
+            object : ValidateAccountListener {
+              override fun onSuccess(response: AccountValidationResponse) {
+                sortValidateAccountResponse(response, firstName, middleName, lastName, accountNo)
+              }
+
+              override fun onFailed(errorMessage: String) {
+                dismissDialogProgress()
+                extractErrorMessageData(errorMessage)
               }
             })
             }
       }
   }
 
-  private fun sortValidateAccountResponse(response: AccountValidationResponse) {
+  private fun sortValidateAccountResponse(response: AccountValidationResponse, firstName: String, middleName: String, lastName: String, accountNo: String) {
 	  if(response.status == "failure" || response.status_code >= 400){
-      if(response.message?.contains("Lookup on any one of the request parameter[iso_code, routing_code, sort_code") ?: false){
+      if(response.message?.contains("Lookup on any one of the request parameter") ?: false){
       showMessage("Check and verify your iso code or routing code or sort code")
       return
       }else{
@@ -1279,11 +963,74 @@ showMessage("Receiving Mode is required!")
 		  return
           }
 	  }
+      
+      dismissDialogProgress()
 	  
 	  val intent = Intent(this, InputScreen::class.java)
+      if (receivingMode.contains("MOBILEWALLET")) {
+    intent.putExtra("CORRESPONDENT", "LR")
+    intent.putExtra("BANK_ID", null as String?)
+    intent.putExtra("BRANCH_ID", null as String?)
+} else if (receivingMode.contains("BANK")) {
+    intent.putExtra("CORRESPONDENT", null as String?)
+    intent.putExtra("BANK_ID", null as String?)
+    intent.putExtra("BRANCH_ID", null as String?)
+} else {
+    intent.putExtra("CORRESPONDENT", "LR")
+    intent.putExtra("BANK_ID", "INOPCP")
+    intent.putExtra("BRANCH_ID", "OP")
+}
+
+if (receivingCountryCode == "IN") {
+    intent.putExtra("ISO_CODE", null as String?)
+    intent.putExtra("ROUTING_CODE", this.routingCode)
+} else {
+    intent.putExtra("ISO_CODE", this.isoCode)
+    intent.putExtra("ROUTING_CODE", null as String?)
+}
+
+if(receivingCountryCode.equals("EG") || receivingCountryCode.equals("PK") || receivingCountryCode.equals("LK")){
+   intent.putExtra("ACCOUNT_NUMBER", null as String?)
+      intent.putExtra("IBAN", this.iban)
+}else{
+   intent.putExtra("ACCOUNT_NUMBER", accountNo)
+      intent.putExtra("IBAN", null as String?)
+}
+      
+      
+      intent.putExtra("SENDER_CURRENCY_CODE", this.sendingCurrencyCode)
+      intent.putExtra("RECEIVER_CURRENCY_CODE", this.receivingCurrencyCode)
+      intent.putExtra("CORRESPONDENT_NAME", this.correspondentName)
+      intent.putExtra("BRANCH_NAME", this.branchName)
+      intent.putExtra("SORT_CODE", this.sort)
+      intent.putExtra("BANK_NAME", this.bankName)
+      intent.putExtra("BANK_BRANCH_NAME", this.bankBranchName)
+      intent.putExtra("IFSC", this.ifsc)
+      intent.putExtra("BIC", this.bic)
+      intent.putExtra("ADDRESS", this.address)
+      intent.putExtra("TOWN_NAME", this.townName)
+      intent.putExtra("ACCOUNT_TYPE_CODE", this.selectedReceiverAcctType)
+      intent.putExtra("COUNTRY_SUBDIVISION", this.countrySubdivision)
+      intent.putExtra("RECEIVER_FIRST_NAME", firstName)
+      intent.putExtra("RECEIVER_MIDDLE_NAME", middleName)
+      intent.putExtra("RECEIVER_LAST_NAME", lastName)
+      intent.putExtra("RECEIVER_PHONE_NO", this.receiverPhoneNoEdittext.text.toString())
+      intent.putExtra("TYPE", this.type)
+      intent.putExtra("RECEIVING_MODE", this.receivingMode)
+      intent.putExtra("RECEIVING_MODE_NAME", this.selectedReceivingModeName)
+      intent.putExtra("RECEIVING_COUNTRY_CODE", this.receivingCountryCode)
+      intent.putExtra("SENDING_COUNTRY_CODE", this.sendingCountryCode)
+      intent.putExtra("LIMIT_MIN_AMOUNT", this.limitMinAmount.toString())
+      intent.putExtra("LIMIT_PER_TRANSACTION", this.limitPerTransaction.toString())
+      intent.putExtra("SEND_MIN_AMOUNT", this.sendMinAmount.toString())
+      intent.putExtra("SEND_MAX_AMOUNT", this.sendMaxAmount.toString())
+      intent.putExtra("RECEIVER_ADDRESS_LINE", this.receiverAddressEdittext.text.toString())
+      intent.putExtra("RECEIVER_TOWN_NAME", this.receiverTownNameEdittext.text.toString())
+      intent.putExtra("RECEIVER_COUNTRY_SUBDIVISION", this.receiverCountrySubdivisionEdittext.text.toString())
+      intent.putExtra("INSTRUMENT", this.selectedInstrument)
 	  startActivity(intent)
   }
-
+ 
   private fun addSession(
       username: String,
       password: String,
@@ -1330,10 +1077,14 @@ showMessage("Receiving Mode is required!")
   private fun showMessage(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
   }
+  
+  private fun notifyUserForMobileWallet(){
+  
+  }
 
   private fun showDialogProgress() {
     // Build the AlertDialog
-    dialog = AlertDialog.Builder(this)
+    dialog = AlertDialog.Builder(this, R.style.TransparentDialog)
         .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
         .setCancelable(false) // Disable back button dismiss
         .create()
@@ -1389,40 +1140,50 @@ this.townName = townName
 this.countrySubdivision = countrySubdivision
 this.countryCode = countryCode
 
-if(address.isNullOrEmpty() || address.isNullOrBlank() || address.equals(".") || address.equals("-")){
-    if (receiverAddressEdittext.visibility == View.GONE) {
-      receiverAddressEdittext.visibility = View.VISIBLE
-    }
-    }else{
-    if (receiverAddressEdittext.visibility == View.VISIBLE) {
-      receiverAddressEdittext.visibility = View.GONE
-    }
-    }
-    
-    if(townName.isNullOrEmpty() || townName.isNullOrBlank() || townName.equals(".") || townName.equals("-")){
-    if (receiverTownNameEdittext.visibility == View.GONE) {
-      receiverTownNameEdittext.visibility = View.VISIBLE
-    }
-    }else{
-    if (receiverTownNameEdittext.visibility == View.VISIBLE) {
-      receiverTownNameEdittext.visibility = View.GONE
-    }
-    }
-    
-    if(countrySubdivision.isNullOrEmpty() || countrySubdivision.isNullOrBlank() || countrySubdivision.equals(".") || countrySubdivision.equals("-")){
-    if (receiverCountrySubdivisionEdittext.visibility == View.GONE) {
-      receiverCountrySubdivisionEdittext.visibility = View.VISIBLE
-    }
-    }else{
-    if (receiverCountrySubdivisionEdittext.visibility == View.VISIBLE) {
-      receiverCountrySubdivisionEdittext.visibility = View.GONE
-    }
-    }
+if(countryCode.equals("CN")){
+this.isoCode = "BKCHCNBJXXX"
 }
 
-  override fun onDestroy() {
-    super.onDestroy()
-    // Close the database when the activity is destroyed
-    luluPayDB.closeDatabase()
+if(countryCode.equals("EG")){
+this.isoCode = "NBEGEGCX019"
+}
+
+if(countryCode.equals("IN")){
+this.routingCode = "SBIN0004069"
+}
+
+if(countryCode.equals("PK")){
+this.isoCode = "BKIPPKKAXXX"
+}
+
+if(countryCode.equals("PH")){
+this.isoCode = "MBTCPHMMXXX"
+}
+
+if(countryCode.equals("LK")){
+this.isoCode = "NBEGEGCX019"
+}
+
+}
+  
+  private fun extractErrorMessageData(errorMessage: String){
+    val gson = Gson()
+
+    // Parse the JSON string into a JsonObject
+    val jsonObject = gson.fromJson(errorMessage, JsonObject::class.java)
+
+    // Extract the "message" value
+    val message = jsonObject.get("message").asString
+    
+    showMessage(message)
   }
+
+  override fun onFinishActivity() {
+        finish() // Close this activity when called
+    }
+
+  override fun onDestroy() {
+        super.onDestroy()
+        destroyListeners()
+    }
 }

@@ -33,7 +33,7 @@ interface ApiService {
   ): Response<AccessTokenResponse>
 
   // Remittance/Transfer Api
-  @POST("api/v1_0/paas/quote")
+  @POST("/amr/ras/api/v1_0/ras/quote")
   fun createQuote(
       @Header("Authorization") authorization: String, // Bearer token
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -44,7 +44,7 @@ interface ApiService {
       @Body request: QuoteRequest // Request body
   ): Call<QuoteResponse>
 
-  @POST("api/v1_0/paas/createtransaction")
+  @POST("/amr/ras/api/v1_0/ras/createtransaction")
   fun createTransaction(
       @Header("Authorization") authorization: String,
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -55,7 +55,7 @@ interface ApiService {
       @Body request: CreateTransactionRequest
   ): Call<CreateTransactionResponse>
 
-  @POST("/api/v1_0/ras/confirmtransaction")
+  @POST("/amr/ras/api/v1_0/ras/confirmtransaction")
   fun confirmTransaction(
       @Header("Authorization") authorization: String, // Bearer token
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -63,10 +63,10 @@ interface ApiService {
       @Header("channel") channel: String? = "Direct", // Channel info
       @Header("company") company: String? = "784825", // Company info
       @Header("branch") branch: String? = "784826", // Branch info
-      @Body payload: ConfirmTransactionRequest // Request payload
+      @Body request: ConfirmTransactionRequest // Request payload
   ): Call<ConfirmTransactionResponse>
 
-  @POST("api/v1_0/paas/authorize-clearance")
+  @POST("amr/ras/authorize-clearance")
   fun authorizeClearance(
       @Header("Authorization") authorization: String,
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -77,7 +77,7 @@ interface ApiService {
       @Body request: AuthorizationClearanceRequest
   ): Call<AuthorizationClearanceResponse>
 
-  @GET("api/v1_0/paas/enquire-transaction")
+  @GET("/amr/ras/api/v1_0/ras/enquire-transaction")
   fun enquireTransaction(
       @Header("Authorization") authorization: String,
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -99,7 +99,7 @@ interface ApiService {
       @Body request: BrnUpdateRequest
   ): Call<BrnUpdateResponse>
 
-  @GET("api/v1_0/ras/transaction-receipt")
+  @GET("/amr/ras/api/v1_0/ras/transaction-receipt")
   fun getTransactionReceipt(
       @Header("Authorization") authorization: String,
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
@@ -218,7 +218,8 @@ interface ApiService {
       @Header("Authorization") authorization: String, // Bearer token
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
       @Header("sender") sender: String? = null, // Sender info
-      @Header("company") company: String? = "Direct", // Company info
+      @Header("channel") channel: String? = "Direct", // Company info
+      @Header("company") company: String? = "784825", // Company info
       @Header("branch") branch: String? = "784826", // Branch info
       @Query("receiving_country_code") receivingCountryCode: String, // Query parameter
       @Query("iso_code") isoCode: String? = null,
@@ -241,6 +242,10 @@ interface ApiService {
   fun getRates(
       @Header("Authorization") authorization: String, // Bearer token
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("sender") sender: String? = null, // Sender info
+      @Header("channel") channel: String? = "Direct", // Company info
+      @Header("company") company: String? = "784825", // Company info
+      @Header("branch") branch: String? = "784826", // Branch info
       @Query("receiving_currency_code") receiving_currency_code: String? = null,
       @Query("receiving_country_code") receiving_country_code: String? = null,
       @Query("include_correspondents") include_correspondents: String? = null,
@@ -252,11 +257,15 @@ interface ApiService {
   fun validateAccount(
       @Header("Authorization") authorization: String, // Bearer token
       @Header("X-REQUEST-ID") requestId: String, // Unique request ID
+      @Header("sender") sender: String? = null, // Sender info
+      @Header("channel") channel: String? = "Direct", // Company info
+      @Header("company") company: String? = "784825", // Company info
+      @Header("branch") branch: String? = "784826", // Branch info
       @Query("receiving_country_code") receiving_country_code: String, // Query parameter
       @Query("receiving_mode") receiving_mode: String, // Query parameter
       @Query("correspondent") correspondent: String? = null, // Query parameter
       @Query("iso_code") iso_code: String? = null, // Query parameter
-      @Query("routing_code") routing_code: Int? = null, // Query parameter
+      @Query("routing_code") routing_code: String? = null, // Query parameter
       @Query("sort_code") sort_code: String? = null, // Query parameter
       @Query("account_number") account_number: String? = null, // Query parameter
       @Query("iban") iban: String? = null, // Query parameter
@@ -264,6 +273,6 @@ interface ApiService {
       @Query("branch_id") branch_id: String? = null, // Query parameter
       @Query("first_name") first_name: String? = null, // Query parameter
       @Query("middle_name") middle_name: String? = null, // Query parameter
-      @Query("last_name") last_name: String // Query parameter
+      @Query("last_name") last_name: String? = null // Query parameter
   ): Call<AccountValidationResponse>
 }

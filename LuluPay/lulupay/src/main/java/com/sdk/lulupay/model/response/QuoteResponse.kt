@@ -2,53 +2,51 @@ package com.sdk.lulupay.model.response
 
 import java.math.BigDecimal
 
-data class QuoteResponse(val data: QuoteData2? = null)
-
-data class QuoteData2(val status: String,
+data class QuoteResponse(val status: String,
 val statusCode: Int,
 val data: QuoteData
 )
 
 data class QuoteData(
-val quoteId: String,
-val createdAt: String,
-val createdAtGmt: String,
-val expiresAt: String,
-val expiresAtGmt: String,
-val receivingCountryCode: String,
-val receivingCurrencyCode: String,
-val sendingCountryCode: String,
-val sendingCurrencyCode: String,
-val sendingAmount: BigDecimal,
-val receivingAmount: BigDecimal,
-val totalPayinAmount: BigDecimal,
-val fxRates: List<FxRate>,
-val feeDetails: List<FeeDetail>,
-val settlementDetails: List<SettlementDetail>,
-val correspondentRules: List<CorrespondentRule>,
-val priceGuarantee: String
+val quote_id: String,
+val created_at: String,
+val created_at_gmt: String,
+val expires_at: String,
+val expires_at_gmt: String,
+val receiving_country_code: String,
+val receiving_currency_code: String,
+val sending_country_code: String,
+val sending_currency_code: String,
+val sending_amount: BigDecimal,
+val receiving_amount: BigDecimal,
+val total_payin_amount: BigDecimal,
+val fx_rates: List<FxRate>,
+val fee_details: List<FeeDetail>,
+val settlement_details: List<SettlementDetail>,
+val correspondent_rules: List<CorrespondentRule>,
+val price_guarantee: String
 )
 
 data class FxRate(
 val cost_rate: BigDecimal? = null,
 val rate: BigDecimal,
-val baseCurrencyCode: String,
-val counterCurrencyCode: String,
+val base_currency_code: String,
+val counter_currency_code: String,
 val type: String
 )
 
 data class FeeDetail(
 val type: String,
 val model: String,
-val currencyCode: String,
+val currency_code: String,
 val amount: BigDecimal,
 val description: String? = null
 )
 
 data class SettlementDetail(
-val chargeType: String,
+val charge_type: String,
 val value: BigDecimal,
-val currencyCode: String
+val currency_code: String
 )
 
 data class CorrespondentRule(

@@ -8,13 +8,13 @@ data class RateData(val rates: List<Rate>)
 
 data class Rate(
     val rate: BigDecimal,
-    val toCurrencyName: String,
-    val toCurrency: String,
-    val fromCurrency: String,
-    val toCountryName: String,
-    val toCountry: String,
-    val receivingMode: String,
+    val to_currency_name: String,
+    val to_currency: String,
+    val from_currency: String,
+    val to_country_name: String,
+    val to_country: String,
+    val receiving_mode: String,
     val correspondent: String? = null,
     val anywhere: Int? = null,
-    val correspondentName: String? = null
+    val correspondent_name: String? = null
 )

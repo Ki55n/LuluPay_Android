@@ -6,6 +6,9 @@
     <uses-sdk
         android:minSdkVersion="21"
         android:targetSdkVersion="34" />
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
   <application>
     <activity
@@ -14,7 +17,7 @@
 		android:exported="false"
         android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
         android:hardwareAccelerated="true"
-        android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
         android:supportsPictureInPicture="true" />
         
         <activity
@@ -23,7 +26,7 @@
 		android:exported="false"
         android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
         android:hardwareAccelerated="true"
-        android:screenOrientation="portrait"
+        android:windowSoftInputMode="stateHidden"
         android:supportsPictureInPicture="true" />
         
         <activity
@@ -32,7 +35,7 @@
 		android:exported="false"
         android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
         android:hardwareAccelerated="true"
-        android:screenOrientation="portrait"
+        android:windowSoftInputMode="stateHidden"
         android:supportsPictureInPicture="true" />
         
         <activity
@@ -41,8 +44,54 @@
 		android:exported="false"
         android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
         android:hardwareAccelerated="true"
-        android:screenOrientation="portrait"
+        android:windowSoftInputMode="stateHidden"
         android:supportsPictureInPicture="true" />
+        
+        <activity
+        android:name="com.sdk.lulupay.activity.RemittanceDetails"
+            android:theme="@style/Base.Theme.LuLuBanking"
+		android:exported="false"
+        android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="stateHidden"
+        android:supportsPictureInPicture="true" />
+        
+        <activity
+        android:name="com.sdk.lulupay.activity.RemittanceSuccessScreen"
+            android:theme="@style/Base.Theme.LuLuBanking"
+		android:exported="false"
+        android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="stateHidden"
+        android:supportsPictureInPicture="true" />
+        
+    <activity
+        android:name="com.sdk.lulupay.activity.RemittanceDetails"
+            android:theme="@style/Base.Theme.LuLuBanking"
+		android:exported="false"
+        android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="stateHidden"
+        android:supportsPictureInPicture="true" />
+        
+        <activity
+        android:name="com.sdk.lulupay.activity.RemittanceReceipt"
+            android:theme="@style/Base.Theme.LuLuBanking"
+		android:exported="false"
+        android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+        android:hardwareAccelerated="true"
+        android:windowSoftInputMode="stateHidden"
+        android:supportsPictureInPicture="true" />
+        
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+    </provider>
 		</application>
 
 </manifest>

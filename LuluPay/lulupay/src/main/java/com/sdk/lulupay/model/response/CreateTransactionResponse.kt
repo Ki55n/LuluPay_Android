@@ -6,7 +6,7 @@ val data: TransactionData2
 )
 
 data class TransactionData2(
-val transactionRefNumber: String,
+val transaction_ref_number: String,
 val transactionDate: String,
 val transactionGmtDate: String,
 val expiresAt: String,

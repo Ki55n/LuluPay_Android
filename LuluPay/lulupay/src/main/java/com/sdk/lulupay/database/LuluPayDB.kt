@@ -10,10 +10,10 @@ import kotlinx.coroutines.withContext
 
 // Data class for representing the remittance history
 data class RemittanceHistory(
-    val senderName: String,
-    val channelName: String,
-    val branchCode: String,
-    val companyCode: String
+    val transactionRefNo: String,
+    val firstName: String,
+    val lastName: String,
+    val phoneNo: String
 )
 
 class LuluPayDB(context: Context) {
@@ -34,12 +34,12 @@ class LuluPayDB(context: Context) {
                   override fun onCreate(db: SupportSQLiteDatabase) {
                     // Create the table with the required columns
                     db.execSQL(
-                        "CREATE TABLE remittance_history (" +
+                        "CREATE TABLE remittance_saved_receipients (" +
                             "id INTEGER PRIMARY KEY, " +
-                            "senderName TEXT, " +
-                            "channelName TEXT, " +
-                            "branchCode TEXT, " +
-                            "companyCode TEXT)")
+                            "transactionRefNo TEXT, " +
+                            "firstName TEXT, " +
+                            "lastName TEXT, " +
+                            "phoneNo TEXT)")
                   }
 
                   override fun onUpgrade(
@@ -48,7 +48,7 @@ class LuluPayDB(context: Context) {
                       newVersion: Int
                   ) {
                     // Upgrade database (here we drop and recreate the table for simplicity)
-                    db.execSQL("DROP TABLE IF EXISTS remittance_history")
+                    db.execSQL("DROP TABLE IF EXISTS remittance_saved_receipients")
                     onCreate(db)
                   }
                 })
@@ -61,37 +61,37 @@ class LuluPayDB(context: Context) {
     return helper.writableDatabase
   }
 
-  // Insert remittance data with 4 fields (senderName, channelName, branchCode, companyCode)
+  // Insert remittance data with 4 fields (transactionRefNo, firstName, lastName, phoneNo)
   suspend fun insertData(
-      senderName: String,
-      channelName: String,
-      branchCode: String,
-      companyCode: String
+      transactionRefNo: String,
+      firstName: String,
+      lastName: String,
+      phoneNo: String
   ) {
     try {
       val db = getDatabase()
       db.execSQL(
-          "INSERT INTO remittance_history (senderName, channelName, branchCode, companyCode) VALUES (?, ?, ?, ?)",
-          arrayOf(senderName, channelName, branchCode, companyCode))
+          "INSERT INTO remittance_saved_receipients (transactionRefNo, firstName, lastName, phoneNo) VALUES (?, ?, ?, ?)",
+          arrayOf(transactionRefNo, firstName, lastName, phoneNo))
     } catch (e: Exception) {
       throw Exception(e.message)
     }
   }
 
-  // Get all remittance data (senderName, channelName, branchCode, companyCode)
+  // Get all remittance data (transactionRefNo, firstName, lastName, phoneNo)
   suspend fun getAllData(): List<RemittanceHistory> {
     val dataList = mutableListOf<RemittanceHistory>()
     val db = getDatabase()
     var cursor: Cursor? = null
     try {
-      cursor = db.query("SELECT * FROM remittance_history")
+      cursor = db.query("SELECT * FROM remittance_saved_receipients")
       if (cursor.moveToFirst()) {
         do {
-          val senderName = cursor.getString(cursor.getColumnIndexOrThrow("senderName"))
-          val channelName = cursor.getString(cursor.getColumnIndexOrThrow("channelName"))
-          val branchCode = cursor.getString(cursor.getColumnIndexOrThrow("branchCode"))
-          val companyCode = cursor.getString(cursor.getColumnIndexOrThrow("companyCode"))
-          dataList.add(RemittanceHistory(senderName, channelName, branchCode, companyCode))
+          val transactionRefNo = cursor.getString(cursor.getColumnIndexOrThrow("transactionRefNo"))
+          val firstName = cursor.getString(cursor.getColumnIndexOrThrow("firstName"))
+          val lastName = cursor.getString(cursor.getColumnIndexOrThrow("lastName"))
+          val phoneNo = cursor.getString(cursor.getColumnIndexOrThrow("phoneNo"))
+          dataList.add(RemittanceHistory(transactionRefNo, firstName, lastName, phoneNo))
         } while (cursor.moveToNext())
       }
     } catch (e: Exception) {
@@ -105,16 +105,16 @@ class LuluPayDB(context: Context) {
   // Update remittance data by id
   suspend fun updateData(
       id: Int,
-      newSenderName: String,
-      newChannelName: String,
-      newBranchCode: String,
-      newCompanyCode: String
+      newTransactionRefNo: String,
+      newFirstName: String,
+      newLastName: String,
+      newPhoneNo: String
   ) {
     try {
       val db = getDatabase()
       db.execSQL(
-          "UPDATE remittance_history SET senderName = ?, channelName = ?, branchCode = ?, companyCode = ? WHERE id = ?",
-          arrayOf(newSenderName, newChannelName, newBranchCode, newCompanyCode, id))
+          "UPDATE remittance_saved_receipients SET transactionRefNo = ?, firstName = ?, lastName = ?, phoneNo = ? WHERE id = ?",
+          arrayOf(newTransactionRefNo, newFirstName, newLastName, newPhoneNo, id))
     } catch (e: Exception) {
       throw Exception(e.message)
     }
@@ -125,7 +125,7 @@ class LuluPayDB(context: Context) {
     withContext(Dispatchers.IO) {
       try {
         val db = getDatabase()
-        db.execSQL("DELETE FROM remittance_history WHERE id = ?", arrayOf(id))
+        db.execSQL("DELETE FROM remittance_saved_receipients WHERE id = ?", arrayOf(id))
       } catch (e: Exception) {
         throw Exception(e.message)
       }
