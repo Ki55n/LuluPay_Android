@@ -11,6 +11,9 @@ import com.sdk.lulupay.R
 import com.sdk.lulupay.requestId.RequestId
 import com.sdk.lulupay.session.SessionManager
 import com.google.android.material.textfield.TextInputEditText
+import androidx.lifecycle.lifecycleScope
+import com.sdk.lulupay.token.AccessToken
+import kotlinx.coroutines.launch
 
 class LoginScreen : AppCompatActivity() {
 
@@ -40,10 +43,51 @@ class LoginScreen : AppCompatActivity() {
   }
 
   private fun loginUser(username: String, password: String) {
-    addSession(username = username, password = password, grantType = "password", clientId = "cdp_app", scope = null, clientSecret = "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y")
-    
-    redirect()
-  }
+    // Add session information
+    addSession(
+        username = username,
+        password = password,
+        grantType = "password",
+        clientId = "cdp_app",
+        scope = null,
+        clientSecret = "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y"
+    )
+
+    lifecycleScope.launch {
+        try {
+            // Get access token
+            val result = AccessToken.getAccessToken(
+                username = SessionManager.username.orEmpty(),
+                password = SessionManager.password.orEmpty(),
+                requestId = "Test-${RequestId.generateRequestId()}",
+                grantType = SessionManager.grantType ?: "password",
+                clientId = SessionManager.clientId ?: "cdp_app",
+                scope = SessionManager.scope,
+                clientSecret = SessionManager.clientSecret ?: "mSh18BPiMZeQqFfOvWhgv8wzvnNVbj3Y"
+            )
+
+            val error = result.exceptionOrNull()
+            if (error != null) {
+                dismissDialog()
+                showMessage(error.message ?: "Error occurred: Null")
+                return@launch
+            }
+
+            val newToken = result.getOrNull()?.access_token
+            if (newToken.isNullOrEmpty()) {
+                dismissDialog()
+                showMessage("Access token is null or empty")
+                return@launch
+            }
+
+            // Redirect on successful login
+            redirect()
+        } catch (e: Exception) {
+            dismissDialog()
+            showMessage(e.message ?: "An unexpected error occurred")
+        }
+    }
+}
 
  private fun redirect() {
  dismissDialog()
@@ -78,7 +122,7 @@ class LoginScreen : AppCompatActivity() {
 
   private fun showDialog() {
     // Build the AlertDialog
-    dialog = AlertDialog.Builder(this)
+    dialog = AlertDialog.Builder(this, R.style.TransparentDialog)
         .setView(R.layout.custom_dialog) // Set custom layout as the dialog's content
         .setCancelable(false) // Disable back button dismiss
         .create()

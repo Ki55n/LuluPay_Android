@@ -16,74 +16,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Sender Details Header -->
-            <TextView
-                android:id="@+id/senderDetailsHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sender Details"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:paddingBottom="8dp" />
-
-            <!-- Sender Name -->
-            <EditText
-                android:id="@+id/sender_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Sender Name"
-                android:inputType="text"
-                android:padding="12dp"
-                android:background="@drawable/custom_edit_text" />
-
-            <!-- Sender Phone Number -->
-            <EditText
-                android:id="@+id/sender_phone_no"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Sender Phone Number"
-                android:inputType="phone"
-                android:padding="12dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_edit_text" />
-
-            <TextView
-                android:id="@+id/senderAddressDetailsHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sender Address"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:paddingBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/address_type"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_edit_text"
-                android:padding="12dp" />
-
-            <EditText
-                android:id="@+id/address_line"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Address Line"
-                android:inputType="text"
-                android:padding="12dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_edit_text" />
-
-            <EditText
-                android:id="@+id/town_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Town Name"
-                android:inputType="text"
-                android:padding="12dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/custom_edit_text" />
-
             <!-- Receiver Details Header -->
             <TextView
                 android:id="@+id/receiverDetailsHeader"
@@ -153,15 +85,6 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/custom_edit_text"
                 android:padding="12dp" />
-            <!-- Select Bank Spinner -->
-            <Spinner
-                android:id="@+id/receiver_bank"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="gone"
-                android:background="@drawable/custom_edit_text"
-                android:padding="12dp" />
 
             <Spinner
                 android:id="@+id/receiver_acct_type"
@@ -200,8 +123,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Search"
+                android:text="Search Banks"
                 android:textSize="16sp"
+                android:visibility="gone"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@color/button_color"
                 app:cornerRadius="8dp"
@@ -215,6 +139,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Routing Code"
                 android:enabled="false"
+                android:visibility="gone"
                 android:inputType="text"
                 android:padding="12dp"
                 android:layout_marginTop="8dp"
@@ -224,10 +149,10 @@
                 android:id="@+id/receiver_iso_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Bic\Swift Code"
-                android:enabled="false"
+                android:hint="Bic/Swift Code"
                 android:inputType="text"
                 android:padding="12dp"
+                android:enabled="true"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/custom_edit_text" />
             
@@ -238,7 +163,8 @@
                     android:hint="Address"
                     android:inputType="text"
                     android:padding="12dp"
-                    android:visibility="gone"
+                android:visibility="gone"
+                android:enabled="false"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/custom_edit_text" />
 
@@ -248,8 +174,9 @@
                     android:layout_height="wrap_content"
                     android:hint="Town Name"
                     android:inputType="text"
-                    android:padding="12dp"
                     android:visibility="gone"
+                    android:padding="12dp"
+                    android:enabled="false"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/custom_edit_text" />
 
@@ -261,6 +188,7 @@
                     android:inputType="text"
                     android:padding="12dp"
                     android:visibility="gone"
+                    android:enabled="false"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/custom_edit_text" />
 
@@ -286,7 +214,7 @@
                     android:background="@drawable/custom_edit_text"
                     android:padding="12dp" />
 
-                <!-- Select Purpose Spinner -->
+                <!-- Select Purpose Spinner
                 <Spinner
                     android:id="@+id/select_purpose"
                     android:layout_width="match_parent"
@@ -296,7 +224,7 @@
                     android:background="@drawable/custom_edit_text"
                     android:padding="12dp" />
 
-                <!-- Payment Mode Spinner -->
+                    Payment Mode Spinner 
                 <Spinner
                     android:id="@+id/payment_mode"
                     android:layout_width="match_parent"
@@ -306,7 +234,7 @@
                     android:background="@drawable/custom_edit_text"
                     android:padding="12dp" />
 
-                <!-- Source of Income Spinner -->
+                   Source of Income Spinner 
                 <Spinner
                     android:id="@+id/source_of_income"
                     android:layout_width="match_parent"
@@ -315,7 +243,7 @@
                     android:layout_marginBottom="16dp"
                     android:visibility="gone"
                     android:background="@drawable/custom_edit_text"
-                    android:padding="12dp" />
+                    android:padding="12dp" /> -->
 
                 <Spinner
                     android:id="@+id/correspondent"
@@ -325,7 +253,7 @@
                     android:layout_marginBottom="16dp"
                     android:visibility="gone"
                     android:background="@drawable/custom_edit_text"
-                    android:padding="12dp" />
+                    android:padding="12dp" /> 
                 <Button
                     android:id="@+id/get_details_btn"
                     android:layout_width="match_parent"
@@ -337,7 +265,7 @@
                     android:layout_marginBottom="34dp"
                     android:background="@drawable/custom_button_back"
                     android:padding="18dp"
-                    android:text="Get Details"
+                    android:text="Validate Account Details"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
@@ -351,7 +279,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="32dp"
+        app:behavior_peekHeight="0dp"
         app:behavior_skipCollapsed="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     />

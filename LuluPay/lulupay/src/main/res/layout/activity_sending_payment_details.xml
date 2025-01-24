@@ -7,7 +7,7 @@
      android:layout_width="match_parent"
      android:background="@color/blue"
      android:id="@+id/main"
-     tools:context=".Send_Money">
+     tools:context=".RemittanceDetails">
 
     <RelativeLayout
          android:layout_height="100dp"
@@ -43,7 +43,7 @@
     </RelativeLayout>
 
     <include
-         layout="@layout/bottom_sheet_enter_amount"
+         layout="@layout/bottom_sheet_paymentdetails"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
          app:layout_constraintStart_toStartOf="parent"

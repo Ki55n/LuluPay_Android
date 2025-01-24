@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="match_parent"
+     android:layout_width="match_parent"
+     android:background="@drawable/bottom_sheet_background"
+     android:padding="16dp">
+
+    <TextView
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         app:layout_constraintTop_toTopOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         android:textSize="24sp"
+         android:textColor="@color/black"
+         android:layout_marginTop="16dp"
+         android:id="@+id/paymentDetailsHeader"
+         android:text="Payment Details"
+         android:textStyle="bold" />
+
+    <LinearLayout
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:background="@drawable/custom_item_background"
+         android:padding="16dp"
+         android:orientation="horizontal"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         android:layout_marginTop="40dp"
+         app:layout_constraintTop_toBottomOf="@id/paymentDetailsHeader"
+         android:id="@+id/paymentCard">
+
+        <com.google.android.material.imageview.ShapeableImageView
+             android:layout_height="50dp"
+             android:layout_width="50dp"
+             android:src="@drawable/ic_profile_placeholder"
+             app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+             app:strokeWidth="1dp"
+             android:id="@+id/paymentProfileImage" />
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="0dp"
+             android:orientation="vertical"
+             android:layout_marginLeft="16dp"
+             android:layout_weight="1">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:id="@+id/amountLabel"
+                 android:text="Amount" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="18sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/amountValue"
+                 android:text="100₹"
+                 android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <ImageView
+             android:layout_height="26dp"
+             android:layout_width="26dp"
+             android:id="@+id/currencyIcon"
+             android:layout_gravity="center_vertical" />
+
+        <TextView
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             android:textAlignment="center"
+             android:textSize="18sp"
+             android:layout_marginLeft="5dp"
+             android:textColor="@color/black"
+             android:layout_marginTop="12dp"
+             android:id="@+id/currencyName"
+             android:text="INR" />
+
+    </LinearLayout>
+
+    <TextView
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         app:layout_constraintStart_toStartOf="parent"
+         android:textSize="20sp"
+         android:textColor="@color/black"
+         android:layout_marginTop="40dp"
+         app:layout_constraintTop_toBottomOf="@id/paymentCard"
+         android:id="@+id/transactionDetailsHeader"
+         android:text="Transaction Details"
+         android:textStyle="bold" />
+
+    <LinearLayout
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:orientation="vertical"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         android:layout_marginTop="8dp"
+         app:layout_constraintTop_toBottomOf="@id/transactionDetailsHeader"
+         android:id="@+id/transactionDetails">
+        
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:orientation="horizontal"
+             android:layout_marginTop="20dp">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Sending Currency" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/sending_currency_code"
+                 android:text="Dh" />
+            
+            <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:orientation="horizontal"
+             android:layout_marginTop="20dp">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Receiving Currency" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/receiving_currency_code"
+                 android:text="₹" />
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:orientation="horizontal"
+             android:layout_marginTop="20dp">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Amount" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:layout_marginVertical="10dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/amount"
+                 android:text="₹400" />
+
+        </LinearLayout>
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:layout_marginVertical="10dp"
+             android:orientation="horizontal">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Commission Amount" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/commission_amount"
+                 android:text="₹5" />
+
+        </LinearLayout>
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:layout_marginVertical="10dp"
+             android:orientation="horizontal">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Processing Fee" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/processing_fees"
+                 android:text="₹0" />
+
+        </LinearLayout>
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:layout_marginVertical="10dp"
+             android:orientation="horizontal">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Total Amount" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/total_amount"
+                 android:text="₹405" />
+
+        </LinearLayout>
+
+        <LinearLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:layout_marginVertical="10dp"
+             android:orientation="horizontal">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="0dp"
+                 android:textSize="14sp"
+                 android:textColor="@color/gray"
+                 android:layout_weight="1"
+                 android:text="Reference" />
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:textSize="14sp"
+                 android:textColor="@color/black"
+                 android:id="@+id/reference"
+                 android:text="Uber" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+         android:layout_height="56dp"
+         android:layout_width="match_parent"
+         android:background="@drawable/custom_button_back"
+         app:layout_constraintStart_toStartOf="parent"
+         android:textSize="16sp"
+         android:backgroundTint="@color/blue"
+         android:textColor="@color/white"
+         app:layout_constraintEnd_toEndOf="parent"
+         android:layout_marginTop="32dp"
+         app:layout_constraintTop_toBottomOf="@id/transactionDetails"
+         android:id="@+id/proceedButton"
+         android:text="Proceed" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,9 +2,7 @@ package com.sdk.lulupay.model.response
 
 import java.math.BigDecimal
 
-data class QuoteResponse(val data: QuoteData2? = null)
-
-data class QuoteData2(val status: String,
+data class QuoteResponse(val status: String,
 val statusCode: Int,
 val data: QuoteData
 )
