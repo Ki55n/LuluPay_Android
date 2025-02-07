@@ -19,10 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.sdk.lulupay.R
 import com.sdk.lulupay.listeners.*
 import com.sdk.lulupay.model.response.*
-import com.sdk.lulupay.remittance.Remittance
-import com.sdk.lulupay.session.SessionManager
 import com.sdk.lulupay.recyclerView.*
-import com.sdk.lulupay.database.LuluPayDB
 import com.ymg.pdf.viewer.PDFView
 import com.google.android.material.button.MaterialButton
 import java.math.BigDecimal
@@ -53,7 +50,7 @@ class RemittanceReceipt : AppCompatActivity() {
     }
     
     private fun setClickListener(){
-      Button shareBtn: Button = findViewById(R.id.shareReceiptButton)
+        var shareBtn:Button = findViewById(R.id.shareReceiptButton)
       
       shareBtn.setOnClickListener{
       val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")

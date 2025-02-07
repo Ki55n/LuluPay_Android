@@ -49,9 +49,9 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
     implementation("com.google.crypto.tink:tink-android:1.7.0")
     implementation("com.google.android.material:material:1.9.0")
-   implementation ("androidx.preference:preference-ktx:1.2.1")
-   implementation 'com.github.iamyashchouhan:AndroidPdfViewer:1.0.3'
-    implementation "androidx.core:core-ktx:1.12.0" // or the latest stable version
+    implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("com.github.iamyashchouhan:AndroidPdfViewer:1.0.3")
+    implementation("androidx.core:core-ktx:1.12.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
