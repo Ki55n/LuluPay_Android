@@ -265,7 +265,7 @@ private fun handleAutoLogin(intent: Intent) {
                     
                     val remittanceDetail = response.data.firstOrNull() ?: return // Safely handle empty list
                     
-                    val intent = Intent(this@RemittanceScreen, RemittanceDetails::class.java)
+                    val intent = Intent(this@RemittanceScreen, InputScreen::class.java)
                     // Map the response data to the intent extras
     intent.putExtra("SENDING_COUNTRY_CODE", data.transaction.sending_country_code as String?)
     intent.putExtra("TYPE", data.type)

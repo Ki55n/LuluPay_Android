@@ -13,14 +13,21 @@ import android.widget.*
 import android.util.Log
 import androidx.core.content.FileProvider
 import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.sdk.lulupay.R
 import com.sdk.lulupay.listeners.*
 import com.sdk.lulupay.model.response.*
+import com.sdk.lulupay.remittance.Remittance
+import com.sdk.lulupay.session.SessionManager
 import com.sdk.lulupay.recyclerView.*
-import com.ymg.pdf.viewer.PDFView
+import com.sdk.lulupay.database.LuluPayDB
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.google.android.material.button.MaterialButton
 import java.math.BigDecimal
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +57,7 @@ class RemittanceReceipt : AppCompatActivity() {
     }
     
     private fun setClickListener(){
-        var shareBtn:Button = findViewById(R.id.shareReceiptButton)
+      val shareBtn: Button = findViewById(R.id.shareReceiptButton)
       
       shareBtn.setOnClickListener{
       val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")
@@ -108,28 +115,34 @@ class RemittanceReceipt : AppCompatActivity() {
         val outputFile = File(outputDir, "Receipt.pdf")
         savePdfFromByteArray(pdfByteArray, outputFile)
         
-        loadPdf(outputDir.absolutePath)
+        dismissDialogProgress()
+        
+        val pdfImg: ImageView = findViewById(R.id.pdf_img)
+        
+        displayPdfPage(outputDir.absolutePath, pdfImg, 0)
+        pdfImg.visibility = View.VISIBLE
     } else {
         Log.d("RECEIPT", "External storage directory is not available")
     }
 }
-  
-  private fun loadPdf(outputFile: String){
-    PDFView pdfView = findViewById(R.id.pdfView)
-    pdfView.fromAsset(outputFile)
-    .enableSwipe(true)
-    .swipeHorizontal(false)
-    .enableDoubletap(true)
-    .defaultPage(0)
-    .onLoad(new OnLoadCompleteListener() {
-        @Override
-        public void loadComplete(int nbPages) {
-            // Handle loading completion
-            dismissDialogProgress()
-        }
-    })
-    .load()
-  }
+
+  fun displayPdfPage(pdfPath: String, imageView: ImageView, pageIndex: Int = 0) {
+    val file = File(pdfPath)
+    val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+    val pdfRenderer = PdfRenderer(fileDescriptor)
+    val page = pdfRenderer.openPage(pageIndex)
+
+    // Create a Bitmap to hold the page content
+    val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+    // Display the rendered page in an ImageView
+    imageView.setImageBitmap(bitmap)
+
+    // Close resources
+    page.close()
+    pdfRenderer.close()
+}
   
   private fun showMessage(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
