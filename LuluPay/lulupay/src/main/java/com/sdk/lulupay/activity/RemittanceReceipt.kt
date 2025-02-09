@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import com.google.gson.*
 import com.google.gson.JsonObject
+import com.rajat.pdfviewer.PdfRendererView
 import java.io.File
 
 class RemittanceReceipt : AppCompatActivity() {
@@ -62,6 +63,13 @@ class RemittanceReceipt : AppCompatActivity() {
       shareBtn.setOnClickListener{
       val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")
        sharePdfFile(file)
+          if (file.exists()) {
+              val intent = Intent(this, PdfViewScreen::class.java)
+              intent.putExtra("pdf_path", file.absolutePath) // Passing the file path
+              startActivity(intent)
+          } else {
+              Toast.makeText(this, "PDF file not found!", Toast.LENGTH_SHORT).show()
+          }
       }
     }
     
@@ -102,31 +110,30 @@ class RemittanceReceipt : AppCompatActivity() {
         // Start the activity to share the file
         startActivity(Intent.createChooser(shareIntent, "Share PDF using"))
     }
-  
-  private fun sortReceiptTransactionResponse(response: TransactionReceiptResponse) {
-    val base64EncodedData: String = response.data
 
-    // Decode the Base64 string into a ByteArray
-    val pdfByteArray: ByteArray = decodeBase64(base64EncodedData)
+    private fun sortReceiptTransactionResponse(response: TransactionReceiptResponse) {
+        val base64EncodedData: String = response.data
 
-    // Get the external files directory and create a File object for the PDF
-    val outputDir: File? = getExternalFilesDir(null)
-    if (outputDir != null) {
-        val outputFile = File(outputDir, "Receipt.pdf")
-        savePdfFromByteArray(pdfByteArray, outputFile)
-        
-        dismissDialogProgress()
-        
-        val pdfImg: ImageView = findViewById(R.id.pdf_img)
-        
-        displayPdfPage(outputDir.absolutePath, pdfImg, 0)
-        pdfImg.visibility = View.VISIBLE
-    } else {
-        Log.d("RECEIPT", "External storage directory is not available")
+        // Decode the Base64 string into a ByteArray
+        val pdfByteArray: ByteArray = decodeBase64(base64EncodedData)
+
+        // Get the external files directory and create a File object for the PDF
+        val outputDir: File? = getExternalFilesDir(null)
+        if (outputDir != null) {
+            val outputFile = File(outputDir, "Receipt.pdf")
+            savePdfFromByteArray(pdfByteArray, outputFile)
+
+            dismissDialogProgress()
+
+            val pdfView: PdfRendererView = findViewById(R.id.pdfView)
+            pdfView.initWithFile(outputFile) // ✅ Display PDF in PdfRendererView
+            pdfView.visibility = View.VISIBLE
+        } else {
+            Log.d("RECEIPT", "External storage directory is not available")
+        }
     }
-}
 
-  fun displayPdfPage(pdfPath: String, imageView: ImageView, pageIndex: Int = 0) {
+    fun displayPdfPage(pdfPath: String, imageView: ImageView, pageIndex: Int = 0) {
     val file = File(pdfPath)
     val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
     val pdfRenderer = PdfRenderer(fileDescriptor)

@@ -264,7 +264,6 @@ private fun handleAutoLogin(intent: Intent) {
                     dismissDialog()
                     
                     val remittanceDetail = response.data.firstOrNull() ?: return // Safely handle empty list
-                    
                     val intent = Intent(this@RemittanceScreen, InputScreen::class.java)
                     // Map the response data to the intent extras
     intent.putExtra("SENDING_COUNTRY_CODE", data.transaction.sending_country_code as String?)
@@ -275,7 +274,7 @@ private fun handleAutoLogin(intent: Intent) {
     intent.putExtra("LIMIT_MIN_AMOUNT", remittanceDetail.limit_min_amount) // Assuming this is not provided in the response
     intent.putExtra("LIMIT_PER_TRANSACTION", remittanceDetail.limit_per_transaction) // Assuming this is not provided in the response
     intent.putExtra("SEND_MIN_AMOUNT", remittanceDetail.send_min_amount) // Assuming this is not provided in the response
-    intent.putExtra("SEND_MAX_AMOUNT", remittanceDetail.send_max_amount) // Assuming this is not provided in the response
+    intent.putExtra("SEND_MAX_AMOUNT", remittanceDetail.send_max_amount.toString()) // Assuming this is not provided in the response
     intent.putExtra("CORRESPONDENT", correspondent as String?)
     intent.putExtra("BANK_ID", bankId as String?)
     intent.putExtra("BRANCH_ID", branchId as String?)
@@ -298,6 +297,7 @@ private fun handleAutoLogin(intent: Intent) {
 
     // Start the RemittanceDetails activity
     startActivity(intent)
+
                   }
 
                   override fun onFailed(errorMessage: String) {

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication1.databinding.ActivityMainBinding
+import com.sdk.lulupay.activity.PdfViewScreen
 import com.sdk.lulupay.activity.RemittanceScreen
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(
             this@MainActivity,
             RemittanceScreen::class.java
+//            PdfViewScreen::class.java
         )
 
         /* Bundle bundle = new Bundle();

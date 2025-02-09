@@ -115,8 +115,15 @@ class InputScreen : AppCompatActivity(), FinishActivityListener {
     limitMinAmount = getIntentBigDecimal(intent, "LIMIT_MIN_AMOUNT") ?: BigDecimal.ZERO
     limitPerTransaction = getIntentBigDecimal(intent, "LIMIT_PER_TRANSACTION") ?: BigDecimal.ZERO
     sendMinAmount = getIntentBigDecimal(intent, "SEND_MIN_AMOUNT") ?: BigDecimal.ZERO
-    sendMaxAmount = getIntentBigDecimal(intent, "SEND_MAX_AMOUNT") ?: BigDecimal.ZERO
-    correspondent = intent.getStringExtra("CORRESPONDENT") ?: null
+      sendMaxAmount = intent.getStringExtra("SEND_MAX_AMOUNT")?.let {
+          try {
+              BigDecimal(it)
+          } catch (e: NumberFormatException) {
+              BigDecimal.ZERO
+          }
+      } ?: BigDecimal.ZERO
+
+      correspondent = intent.getStringExtra("CORRESPONDENT") ?: null
     sendingCurrencyCode = intent.getStringExtra("SENDER_CURRENCY_CODE") ?: ""
     receivingCurrencyCode = intent.getStringExtra("RECEIVER_CURRENCY_CODE") ?: ""
     correspondentName = intent.getStringExtra("CORRESPONDENT_NAME") ?: ""
