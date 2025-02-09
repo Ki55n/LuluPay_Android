@@ -144,6 +144,39 @@ private fun handleAutoLogin(intent: Intent) {
     }
 }
 
+  private fun showAlertDialog(title: String, transactionRefNo: String) {
+    val builder = AlertDialog.Builder(this)
+    builder.setTitle(title)
+    builder.setMessage("Please choose the action you want")
+
+    // Positive Button (Send Money)
+    builder.setPositiveButton("Send Money") { dialog, _ ->
+        dialog.dismiss()
+        showDialog()
+        getEnquireTransaction(transactionRefNo)
+    }
+
+    // Neutral Button (View Details)
+    builder.setNeutralButton("View Receipt") { dialog, _ ->
+        dialog.dismiss()
+        redirectToReceiptScreen(transactionRefNo)
+    }
+
+    // Negative Button (Cancel Transaction)
+    builder.setNegativeButton("Cancel") { dialog, _ ->
+        dialog.dismiss()
+    }
+
+    val dialog = builder.create()
+    dialog.show()
+}
+
+  private fun redirectToReceiptScreen(transactionRefNo: String){
+    val intent = Intent(this, RemittanceReceipt::class.java)
+    intent.putExtra("TRANSACTION_REF_NO", transactionRefNo)
+       startActivity(intent)
+  }
+
   private fun showError(title: String, errorMessage: String) {
     val builder = AlertDialog.Builder(this) // 'this' refers to the current activity context
     builder.setTitle(title)
@@ -181,17 +214,35 @@ private fun handleAutoLogin(intent: Intent) {
                 transactionRefNo = it.transactionRefNo
             )
         }
-        var adapter = ReceipientsAdapter(receipients) { position, _->
-        val selected = receipients[position]
+        val adapter = ReceipientsAdapter(
+        receipients,
+            onItemClick = { position, recipient ->
+              // Handle normal click
+                 val selected = receipients[position]
         
-        val transactionRefNo = selected.transactionRefNo
+                 val transactionRefNo = selected.transactionRefNo
+                 val name = selected.firstName + selected.lastName
         
-         showDialog()
-         getEnquireTransaction(transactionRefNo)
+                  showAlertDialog(name, transactionRefNo)
+                 },
+            onItemLongClick = { position, recipient ->
+             // Handle long click (e.g., show delete confirmation)
+                val selected = receipients[position]
+                
+                val transactionRefNo = selected.transactionRefNo
+                
+                redirectToHistoryScreen(transactionRefNo)
         }
+     )
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
+    
+    private fun redirectToHistoryScreen(transactionRefNo: String){
+        val intent = Intent(this@RemittanceScreen, TransactionHistoryScreen::class.java)
+        intent.putExtra("TRANSACTION_REF_NO", transactionRefNo)
+        startActivity(intent)
     }
     
     private fun getEnquireTransaction(transactionRefNo: String){
@@ -222,6 +273,9 @@ private fun handleAutoLogin(intent: Intent) {
     var bankId: String? = null
     var branchId: String? = null
     
+    val receivingMode: String = data.transaction.receiving_mode
+    
+    if(!receivingMode.equals("BANK")){
     if(data.receiver.cashpickup_details?.correspondent != null){
        correspondent = data.receiver.cashpickup_details?.correspondent
        }else if(data.receiver.mobilewallet_details?.correspondent != null){
@@ -245,8 +299,8 @@ private fun handleAutoLogin(intent: Intent) {
     }else{
       branchId = null
     }
+    }
     
-    val receivingMode: String = data.transaction.receiving_mode
     val receivingCountryCode: String = data.transaction.receiving_country_code
     
     getServiceCorridor(data, correspondent, bankId, branchId, receivingMode, receivingCountryCode)
@@ -271,9 +325,9 @@ private fun handleAutoLogin(intent: Intent) {
     intent.putExtra("RECEIVING_MODE", data.transaction.receiving_mode as String?)
     intent.putExtra("RECEIVING_MODE_NAME", data.transaction.receiving_mode as String?)// Assuming receiving_mode is the same as receiving_mode_name
     intent.putExtra("RECEIVING_COUNTRY_CODE", data.transaction.receiving_country_code as String?)
-    intent.putExtra("LIMIT_MIN_AMOUNT", remittanceDetail.limit_min_amount) // Assuming this is not provided in the response
-    intent.putExtra("LIMIT_PER_TRANSACTION", remittanceDetail.limit_per_transaction) // Assuming this is not provided in the response
-    intent.putExtra("SEND_MIN_AMOUNT", remittanceDetail.send_min_amount) // Assuming this is not provided in the response
+    intent.putExtra("LIMIT_MIN_AMOUNT", remittanceDetail.limit_min_amount.toString()) // Assuming this is not provided in the response
+    intent.putExtra("LIMIT_PER_TRANSACTION", remittanceDetail.limit_per_transaction.toString()) // Assuming this is not provided in the response
+    intent.putExtra("SEND_MIN_AMOUNT", remittanceDetail.send_min_amount.toString()) // Assuming this is not provided in the response
     intent.putExtra("SEND_MAX_AMOUNT", remittanceDetail.send_max_amount.toString()) // Assuming this is not provided in the response
     intent.putExtra("CORRESPONDENT", correspondent as String?)
     intent.putExtra("BANK_ID", bankId as String?)
@@ -346,7 +400,11 @@ private fun handleAutoLogin(intent: Intent) {
             if (error != null) {
                 dismissDialog()
                 showError("Error Occurred", (error.message ?: "Error occurred: Null"))
+                if(isLikelyJson(error.message ?: "Error occurred: Null")){
+                extractErrorMessageData(error.message ?: "Error occurred: Null")
+                }else{
                 showMessage(error.message ?: "Error occurred: Null")
+                }
                 return@launch
             }
 

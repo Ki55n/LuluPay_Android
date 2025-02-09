@@ -42,15 +42,28 @@ class RemittanceReceipt : AppCompatActivity() {
 
    private var transactionRefNo: String = ""
    private lateinit var dialog: AlertDialog
+   private lateinit var outputDir: File
 	
     override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_receipt_details)
     
+    init()
     showDialogProgress()
     getIntentExtra()
     getTransactionReceipt()
     setClickListener()
+    }
+    
+    private fun init(){
+        outputDir = File(getExternalFilesDir(null), transactionRefNo)
+        if(outputDir != null && !outputDir.exists()){
+            outputDir.mkdirs()
+        }
+        
+        if (outputDir != null) {
+            outputDir = File(outputDir.absolutePath, "Receipt.pdf")
+            }
     }
     
     private fun getIntentExtra(){
@@ -58,14 +71,19 @@ class RemittanceReceipt : AppCompatActivity() {
     }
     
     private fun setClickListener(){
+      val backBtn: Button = findViewById(R.id.back_button)
       val shareBtn: Button = findViewById(R.id.shareReceiptButton)
       
+      backBtn.setOnClickListener{
+          finish()
+      }
+      
       shareBtn.setOnClickListener{
-      val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")
-       sharePdfFile(file)
-          if (file.exists()) {
+     // val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")
+       sharePdfFile(outputDir)
+          if (outputDir.exists()) {
               val intent = Intent(this, PdfViewScreen::class.java)
-              intent.putExtra("pdf_path", file.absolutePath) // Passing the file path
+              intent.putExtra("pdf_path", outputDir.absolutePath) // Passing the file path
               startActivity(intent)
           } else {
               Toast.makeText(this, "PDF file not found!", Toast.LENGTH_SHORT).show()
@@ -116,40 +134,21 @@ class RemittanceReceipt : AppCompatActivity() {
 
         // Decode the Base64 string into a ByteArray
         val pdfByteArray: ByteArray = decodeBase64(base64EncodedData)
-
-        // Get the external files directory and create a File object for the PDF
-        val outputDir: File? = getExternalFilesDir(null)
+        
         if (outputDir != null) {
-            val outputFile = File(outputDir, "Receipt.pdf")
-            savePdfFromByteArray(pdfByteArray, outputFile)
+        if(!outputDir.exists()){
+            savePdfFromByteArray(pdfByteArray, outputDir)
+            }
 
             dismissDialogProgress()
 
             val pdfView: PdfRendererView = findViewById(R.id.pdfView)
-            pdfView.initWithFile(outputFile) // ✅ Display PDF in PdfRendererView
+            pdfView.initWithFile(outputDir) // ✅ Display PDF in PdfRendererView
             pdfView.visibility = View.VISIBLE
         } else {
             Log.d("RECEIPT", "External storage directory is not available")
         }
     }
-
-    fun displayPdfPage(pdfPath: String, imageView: ImageView, pageIndex: Int = 0) {
-    val file = File(pdfPath)
-    val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-    val pdfRenderer = PdfRenderer(fileDescriptor)
-    val page = pdfRenderer.openPage(pageIndex)
-
-    // Create a Bitmap to hold the page content
-    val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-
-    // Display the rendered page in an ImageView
-    imageView.setImageBitmap(bitmap)
-
-    // Close resources
-    page.close()
-    pdfRenderer.close()
-}
   
   private fun showMessage(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

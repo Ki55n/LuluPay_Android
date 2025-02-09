@@ -15,6 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import com.sdk.lulupay.token.AccessToken
 import com.sdk.lulupay.storage.SecureLoginStorage
 import kotlinx.coroutines.launch
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
 class LoginScreen : AppCompatActivity() {
 
@@ -61,7 +63,11 @@ class LoginScreen : AppCompatActivity() {
             val error = result.exceptionOrNull()
             if (error != null) {
                 dismissDialog()
-                showMessage(error.message ?: "Error occurred: Null")
+                if(isLikelyJson(error.message ?: "Error occurred: ")){
+                extractErrorMessageData(error.message ?: "Error occurred: ")
+                }else{
+                showMessage(error.message ?: "Error occurred: ")
+                }
                 return@launch
             }
 
@@ -143,6 +149,22 @@ class LoginScreen : AppCompatActivity() {
     if (dialog.isShowing == true) {
       dialog.dismiss()
     }
+  }
+  
+  private fun isLikelyJson(input: String): Boolean {
+    return input.trimStart().startsWith('{') || input.trimStart().startsWith('[')
+}
+  
+  private fun extractErrorMessageData(errorMessage: String){
+    val gson = Gson()
+
+    // Parse the JSON string into a JsonObject
+    val jsonObject = gson.fromJson(errorMessage, JsonObject::class.java)
+
+    // Extract the "message" value
+    val message = jsonObject.get("message").asString
+    
+    showMessage(message)
   }
 
   private fun showMessage(message: String) {

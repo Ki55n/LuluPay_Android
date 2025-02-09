@@ -72,6 +72,15 @@
             android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
 
+        <activity
+            android:name=".activity.TransactionHistoryScreen"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"
+            android:theme="@style/Base.Theme.LuLuBanking"
+            android:windowSoftInputMode="stateHidden" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
