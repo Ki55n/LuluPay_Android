@@ -28,7 +28,7 @@ import com.google.gson.JsonObject
 
 class TransactionHistoryScreen : AppCompatActivity(){
 
-  private lateinit var backBtn: Button
+  private lateinit var backBtn: ImageButton
   private lateinit var transactionState: TextView
   private lateinit var transactionSubState: TextView
   private lateinit var transactionDate: TextView
@@ -127,7 +127,7 @@ class TransactionHistoryScreen : AppCompatActivity(){
         receiverName.setText("Receiver: " + response.data.receiver.first_name + " " + response.data.receiver.middle_name + " " + response.data.receiver.last_name)
         receiverPhoneNo.setText("Mobile: " + response.data.receiver.mobile_number)
         receiverRefNo.setText("Ref No: " + response.data.transaction.agent_transaction_ref_number)
-        transactionAmount.setText("Amount: " + response.data.transaction.sending_currency_code + " " + response.data.transaction.sending_amount + " → " + response.data.transaction.receiving_currency_code + " " + response.data.transaction.sending_amount)
+        transactionAmount.setText("Amount: " + response.data.transaction.sending_currency_code + " " + response.data.transaction.sending_amount + " → " + response.data.transaction.receiving_currency_code + " " + response.data.transaction.receiving_amount)
     }
  
  private fun showDialog() {

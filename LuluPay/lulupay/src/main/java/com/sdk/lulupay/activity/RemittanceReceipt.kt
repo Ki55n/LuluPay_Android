@@ -71,7 +71,7 @@ class RemittanceReceipt : AppCompatActivity() {
     }
     
     private fun setClickListener(){
-      val backBtn: Button = findViewById(R.id.back_button)
+      val backBtn: ImageButton = findViewById(R.id.back_button)
       val shareBtn: Button = findViewById(R.id.shareReceiptButton)
       
       backBtn.setOnClickListener{

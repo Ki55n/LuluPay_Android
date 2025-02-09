@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:background="@color/blue"
     android:id="@+id/main"
-    tools:context=".RemittanceScreen">
+    tools:context=".activity.RemittanceScreen">
 
     <RelativeLayout
         android:layout_height="100dp"
