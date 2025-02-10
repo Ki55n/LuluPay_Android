@@ -48,10 +48,8 @@ class RemittanceReceipt : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_receipt_details)
     
-    showDialogProgress()
     getIntentExtra()
     init()
-    getTransactionReceipt()
     setClickListener()
     }
     
@@ -64,6 +62,20 @@ class RemittanceReceipt : AppCompatActivity() {
         if (outputDir != null) {
             outputDir = File(outputDir.absolutePath, "Receipt.pdf")
             }
+            
+            // Refetch the receipt if it didn't exists
+            if(outputDir.exists()){
+                showReceipt()
+            }else{
+                showDialogProgress()
+                getTransactionReceipt()
+            }
+    }
+    
+    private fun showReceipt(){
+        val pdfView: PdfRendererView = findViewById(R.id.pdfView)
+            pdfView.initWithFile(outputDir) // ✅ Display PDF in PdfRendererView
+            pdfView.visibility = View.VISIBLE
     }
     
     private fun getIntentExtra(){
@@ -134,10 +146,6 @@ class RemittanceReceipt : AppCompatActivity() {
             }
 
             dismissDialogProgress()
-
-            val pdfView: PdfRendererView = findViewById(R.id.pdfView)
-            pdfView.initWithFile(outputDir) // ✅ Display PDF in PdfRendererView
-            pdfView.visibility = View.VISIBLE
         } else {
             Log.d("RECEIPT", "External storage directory is not available")
         }

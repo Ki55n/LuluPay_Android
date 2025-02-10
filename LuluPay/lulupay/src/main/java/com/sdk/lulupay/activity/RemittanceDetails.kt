@@ -30,6 +30,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.JsonObject
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sdk.lulupay.database.RemittanceHistory
 
 class RemittanceDetails : AppCompatActivity() {
 
@@ -102,6 +103,7 @@ class RemittanceDetails : AppCompatActivity() {
     
     getIntentExtras()
     setupViews()
+
     setClickListener()
     setData()
     setupRecyclerViewFxRateAdapter(fxRate = fxRates)
@@ -214,6 +216,8 @@ class RemittanceDetails : AppCompatActivity() {
      override fun onSuccess(response: ConfirmTransactionResponse){
        dismissDialogProgress()
        
+       saveRecipient(transactionRefNo, firstName, lastName, phoneNo, iban, accountNo)
+       
        val intent = Intent(this@RemittanceDetails, RemittanceSuccessScreen::class.java)
        intent.putExtra("TRANSACTION_REF_NO", transactionRefNo)
        intent.putExtra("RECEIVER_FIRST_NAME", firstName)
@@ -246,8 +250,6 @@ class RemittanceDetails : AppCompatActivity() {
   private fun sortCreateTransactionResponse(response: CreateTransactionResponse){
   val transactionRefNo: String = response.data.transaction_ref_number
   
-  saveRecipient(transactionRefNo, firstName, lastName, phoneNo)
-  
   showAgentPaymentDebitDialog(transactionRefNo, null)
   }
   
@@ -255,25 +257,48 @@ class RemittanceDetails : AppCompatActivity() {
       transactionRefNo: String,
       firstName: String,
       lastName: String,
-      phoneNo: String
+      phoneNo: String,
+      iban: String?,
+      accountNo: String?
   ) {
     lifecycleScope.launch {
       try {
-        withContext(Dispatchers.IO) {
           // Perform the database operation in the IO context
           val luluPayDB: LuluPayDB = LuluPayDB(this@RemittanceDetails)
-          luluPayDB.insertData(transactionRefNo, firstName, lastName, phoneNo)
-        }
-        // Show success message on the main thread
-        showMessage("Recipient saved successfully!")
+          
+          if(accountExist(iban, accountNo, luluPayDB)){
+              showMessage("Account exist before")
+          }else{
+              luluPayDB.insertData(transactionRefNo, firstName, lastName, phoneNo, iban, accountNo)
+              showMessage("Recipient saved successfully!")
+          }
       } catch (e: Exception) {
         // Handle and show the error message
         showMessage(e.message ?: "An unexpected error occurred")
       }
     }
   }
-  
-  private fun showAgentPaymentDebitDialog(transactionRefNo:String, bankRefNo: String?){
+    private suspend fun accountExist(iban: String?, accountNo: String?, luluPayDB: LuluPayDB): Boolean {
+    return try {
+        val remittanceList: List<RemittanceHistory> = luluPayDB.getAllData()
+        
+        for (remittance in remittanceList) {
+            if (remittance.iban != null && remittance.iban == iban) {
+                return true
+            }
+
+            if (remittance.accountNo != null && remittance.accountNo == accountNo) {
+                return true
+            }
+        }
+        false // Return false if no match is found
+    } catch (e: Exception) {
+        false // Return false in case of an error
+    }
+}
+
+
+    private fun showAgentPaymentDebitDialog(transactionRefNo:String, bankRefNo: String?){
      val builder = AlertDialog.Builder(this)
     builder.setTitle("Transfer Confirmation") // Set the title of the dialog
     builder.setMessage("We are about to debit your account and confirm the transaction") // Set the message of the dialog

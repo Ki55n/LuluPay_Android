@@ -1059,19 +1059,7 @@ if(receivingCountryCode.equals("EG") || receivingCountryCode.equals("PK") || rec
       branchCode: String,
       companyCode: String
   ) {
-    lifecycleScope.launch {
-      try {
-        withContext(Dispatchers.IO) {
-          // Perform the database operation in the IO context
-          luluPayDB.insertData(senderName, channelName, branchCode, companyCode)
-        }
-        // Show success message on the main thread
-        showMessage("Recipient saved successfully!")
-      } catch (e: Exception) {
-        // Handle and show the error message
-        showMessage(e.message ?: "An unexpected error occurred")
-      }
-    }
+    
   }
 
   private fun showMessage(message: String) {

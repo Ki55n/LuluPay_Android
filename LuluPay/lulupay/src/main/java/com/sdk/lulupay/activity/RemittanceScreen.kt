@@ -193,9 +193,7 @@ private fun handleAutoLogin(intent: Intent) {
     lifecycleScope.launch {
       try {
       var remittanceList: List<RemittanceHistory>
-        withContext(Dispatchers.IO) {
           remittanceList = luluPayDB.getAllData()
-          }
           // Use the data (e.g., log it or display it in a RecyclerView)
           setupRecyclerViewRecipientsAdapter(remittanceList)
       } catch (e: Exception) {
