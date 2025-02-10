@@ -36,7 +36,7 @@
             android:textSize="24sp"
             android:textColor="@color/white"
             android:id="@+id/transaction_history_text"
-            android:text="Transaction History"
+            android:text="Transaction Status"
             android:textStyle="bold" />
 
     </RelativeLayout>

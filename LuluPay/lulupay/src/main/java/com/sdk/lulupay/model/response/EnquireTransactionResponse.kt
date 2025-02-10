@@ -13,7 +13,7 @@ data class TransactionData(
     val state: String,
     val sub_state: String,
     val transaction_gmt_date: String,
-    val transactionDate: String,
+    val transaction_date: String,
     val type: String,
     val instrument: String,
     val source_of_income: String,

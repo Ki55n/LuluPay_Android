@@ -48,9 +48,9 @@ class RemittanceReceipt : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_receipt_details)
     
-    init()
     showDialogProgress()
     getIntentExtra()
+    init()
     getTransactionReceipt()
     setClickListener()
     }
@@ -81,13 +81,6 @@ class RemittanceReceipt : AppCompatActivity() {
       shareBtn.setOnClickListener{
      // val file: File = File(this@RemittanceReceipt.getExternalFilesDir(null),"Receipt.pdf")
        sharePdfFile(outputDir)
-          if (outputDir.exists()) {
-              val intent = Intent(this, PdfViewScreen::class.java)
-              intent.putExtra("pdf_path", outputDir.absolutePath) // Passing the file path
-              startActivity(intent)
-          } else {
-              Toast.makeText(this, "PDF file not found!", Toast.LENGTH_SHORT).show()
-          }
       }
     }
     

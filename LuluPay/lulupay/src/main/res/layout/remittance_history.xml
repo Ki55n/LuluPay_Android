@@ -4,7 +4,7 @@
      xmlns:app="http://schemas.android.com/apk/res-auto"
      android:layout_height="wrap_content"
      android:layout_width="match_parent"
-     android:background="@drawable/bottom_sheet_background"
+     app:cardCornerRadius="25dp"
      android:layout_margin="8dp"
      app:cardElevation="4dp">
 
@@ -20,7 +20,7 @@
              app:layout_constraintStart_toStartOf="parent"
              android:textSize="16sp"
              android:id="@+id/tvTransactionState"
-             android:text="State: IN_PROGRESS"
+             android:text="State: "
              android:textStyle="bold" />
 
         <TextView
@@ -31,7 +31,7 @@
              android:layout_marginTop="4dp"
              app:layout_constraintTop_toBottomOf="@id/tvTransactionState"
              android:id="@+id/tvTransactionSubState"
-             android:text="Sub-State: TXN_PREPARED" />
+             android:text="Sub-State: " />
 
         <TextView
              android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
              android:layout_marginTop="4dp"
              app:layout_constraintTop_toBottomOf="@id/tvTransactionSubState"
              android:id="@+id/tvTransactionDate"
-             android:text="Date: 2025-02-07" />
+             android:text="Date: " />
 
         <TextView
              android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
              android:layout_marginTop="6dp"
              app:layout_constraintTop_toBottomOf="@id/tvTransactionDate"
              android:id="@+id/tvSenderName"
-             android:text="Sender: AJMAN BASHIRMASIH"
+             android:text="Sender: "
              android:textStyle="bold" />
 
         <TextView
@@ -62,7 +62,7 @@
              android:layout_marginTop="2dp"
              app:layout_constraintTop_toBottomOf="@id/tvSenderName"
              android:id="@+id/tvSenderCustomerNumber"
-             android:text="Customer No: 7841001220007002" />
+             android:text="Customer No: " />
 
         <TextView
              android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
              android:layout_marginTop="6dp"
              app:layout_constraintTop_toBottomOf="@id/tvSenderCustomerNumber"
              android:id="@+id/tvReceiverName"
-             android:text="Receiver: JOHN ABDULLAH AHMAD"
+             android:text="Receiver: "
              android:textStyle="bold" />
 
         <TextView
@@ -83,7 +83,7 @@
              android:layout_marginTop="2dp"
              app:layout_constraintTop_toBottomOf="@id/tvReceiverName"
              android:id="@+id/tvReceiverMobile"
-             android:text="Mobile: +910000" />
+             android:text="Mobile: " />
 
         <TextView
              android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
              android:layout_marginTop="6dp"
              app:layout_constraintTop_toBottomOf="@id/tvReceiverMobile"
              android:id="@+id/tvTransactionRefNo"
-             android:text="Ref No: 1279125103713087"
+             android:text="Ref No: "
              android:textStyle="bold" />
 
         <TextView
@@ -105,7 +105,7 @@
              android:layout_marginTop="6dp"
              app:layout_constraintTop_toBottomOf="@id/tvTransactionRefNo"
              android:id="@+id/tvTransactionAmount"
-             android:text="Amount: AED 100 → PKR 7582.36"
+             android:text="Amount: "
              android:textStyle="bold" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

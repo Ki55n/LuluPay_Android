@@ -121,7 +121,7 @@ class TransactionHistoryScreen : AppCompatActivity(){
     private fun sortEnquireTransactionResponse(response: EnquireTransactionResponse){
         transactionState.setText("State: " + response.data.state)
         transactionSubState.setText("Sub-State" + response.data.sub_state)
-        transactionDate.setText("Date: " + response.data.transactionDate)
+        transactionDate.setText("Date: " + response.data.transaction_date)
         senderName.setText("Sender: " + response.data.sender?.first_name + " " + response.data.sender?.last_name)
         senderCustomerNo.setText("Customer No: " + response.data.sender?.customer_number)
         receiverName.setText("Receiver: " + response.data.receiver.first_name + " " + response.data.receiver.middle_name + " " + response.data.receiver.last_name)
