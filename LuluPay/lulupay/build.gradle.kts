@@ -1,6 +1,20 @@
 plugins {
     id("com.android.library") // Apply the Android Library plugin
     id("org.jetbrains.kotlin.android") // Apply Kotlin Android plugin
+    id("org.jetbrains.dokka") // Apply Dokka plugin
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(buildDir.resolve("dokka"))
+    dokkaSourceSets {
+        named("main") {
+            noAndroidSdkLink.set(false)
+            includeNonPublic.set(true)
+            skipEmptyPackages.set(true)
+            skipDeprecated.set(false)
+            reportUndocumented.set(true)
+        }
+    }
 }
 
 android {
