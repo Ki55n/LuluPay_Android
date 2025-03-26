@@ -129,6 +129,7 @@ class LoginScreen : AppCompatActivity() {
             showMessage("Biometric authentication failed")
         }, onError = {
             // Handle error (e.g., show error message)
+            dismissDialog()
             showErrorDialog(it)
         })
 
