@@ -312,7 +312,7 @@ class RemittanceDetails : AppCompatActivity() {
   private fun sortCreateTransactionResponse(response: CreateTransactionResponse){
   val transactionRefNo: String = response.data.transaction_ref_number
 
-    showBiometricPrompt(transactionRefNo)
+    showAgentPaymentDebitDialog(transactionRefNo, null)
   }
   
 /**
@@ -396,8 +396,7 @@ class RemittanceDetails : AppCompatActivity() {
     builder.setPositiveButton("Pay and Confirm") { dialog, which ->
         // Handle the "Pay" button click (optional)
         dialog.dismiss() // Dismiss the dialog
-        showDialogProgress()
-        confirmTransaction(transactionRefNo, null)
+        showBiometricPrompt(transactionRefNo)
     }
 
     // Optionally, set a negative button
@@ -653,7 +652,7 @@ Log.d("CORRESPONDENT_RULES", fxRatesString4)*/
 }
 
     private fun showBiometricPrompt(transactionRefNo: String) {
-        BiometricHelper.authenticate(this, onSuccess = {
+        BiometricHelper.authenticate("Payment Confirmation", "Please authenticate to continue",this, onSuccess = {
             // Handle success (e.g., navigate to another screen)
             showAgentPaymentDebitDialog(transactionRefNo, null)
         }, onFailure = {

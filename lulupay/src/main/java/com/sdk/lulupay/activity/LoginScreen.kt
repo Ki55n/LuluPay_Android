@@ -109,7 +109,7 @@ class LoginScreen : AppCompatActivity() {
 }
 
     private fun showBiometricPrompt(username: String, password: String) {
-        BiometricHelper.authenticate(this, onSuccess = {
+        BiometricHelper.authenticate("Login Confirmation", "Please authenticate to continue", this, onSuccess = {
             // Handle success (e.g., navigate to another screen)
             // Save it to session to be used for the entire app lifecycle
             addSession(

@@ -666,7 +666,7 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
     }
 
     private fun showBiometricPrompt(email: String, password: String) {
-        BiometricHelper.authenticate(this, onSuccess = {
+        BiometricHelper.authenticate("Login Confirmation", "Please authenticate to continue", this, onSuccess = {
             // Handle success (e.g., navigate to another screen)
             showDialog()
             loginUser(email, password)

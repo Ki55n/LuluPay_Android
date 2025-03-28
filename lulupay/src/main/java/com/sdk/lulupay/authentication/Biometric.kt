@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat
 object BiometricHelper {
 
     fun authenticate(
+        title: String? = "Biometric Authentication",
+        description: String? = "Use your fingerprint to authenticate",
         activity: AppCompatActivity,
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit,
@@ -29,7 +31,7 @@ object BiometricHelper {
                 showBiometricPrompt(activity, onSuccess, onFailure, onError)
             }
             else -> {
-               onError("Biometric, pin or password authentication is not available on this device.")
+               onError("Biometric authentication is not available on this device.")
             }
         }
     }
