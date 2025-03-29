@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
+import com.sdk.lulupay.theme.ThemeManager
 
 /**
  * RemittanceScreen Activity
@@ -46,6 +47,7 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
     private val MANUAL_LOGIN = "ISMANUALLOGIN"
     private val USERNAME: String = "USERNAME"
     private val PASSWORD: String = "PASSWORD"
+    private val DARK_MODE: String = "ISDARKMODE"
 
     private lateinit var addNewReceipientFab: FloatingActionButton
     private lateinit var recyclerView: RecyclerView
@@ -62,6 +64,8 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeManager.setTheme(getIntent().getBooleanExtra(DARK_MODE, false))
+        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.remittance)
 
         luluPayDB = LuluPayDB(this)
@@ -666,16 +670,22 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
     }
 
     private fun showBiometricPrompt(email: String, password: String) {
-        BiometricHelper.authenticate("Login Confirmation", "Please authenticate to continue", this, onSuccess = {
-            // Handle success (e.g., navigate to another screen)
-            showDialog()
-            loginUser(email, password)
-        }, onFailure = {
-            // Handle failure (e.g., show error message)
-            showMessage("Biometric authentication failed")
-        }, onError = {
-            showError("Error Occurred", it)
-        })
+        BiometricHelper.authenticate(
+            "Login Confirmation",
+            "Please authenticate to continue",
+            this,
+            onSuccess = {
+                // Handle success (e.g., navigate to another screen)
+                showDialog()
+                loginUser(email, password)
+            },
+            onFailure = {
+                // Handle failure (e.g., show error message)
+                showMessage("Biometric authentication failed")
+            },
+            onError = {
+                showError("Error Occurred", it)
+            })
 
     }
 

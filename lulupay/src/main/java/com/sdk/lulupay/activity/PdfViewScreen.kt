@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.rajat.pdfviewer.PdfRendererView
 import com.sdk.lulupay.R
+import com.sdk.lulupay.theme.ThemeManager
 import java.io.File
 
 /**
@@ -29,6 +30,7 @@ class PdfViewScreen : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.activity_pdf_view_screen)
 
         pdfView = findViewById(R.id.pdfView)
