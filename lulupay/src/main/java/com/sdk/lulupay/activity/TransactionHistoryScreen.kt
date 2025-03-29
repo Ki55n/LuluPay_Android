@@ -47,14 +47,13 @@ class TransactionHistoryScreen : AppCompatActivity() {
     /**
      * Initializes the activity and sets up the UI components
      * - Sets the content view
-     * - Gets intent extras
+     * - Gets intent extras`
      * - Shows loading dialog
      * - Sets up views and click listeners
      * - Fetches transaction details
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.activity_remittance_history)
 
         getIntentExtra()

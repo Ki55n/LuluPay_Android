@@ -54,7 +54,6 @@ class LoginScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.login)
 
         setupViews()

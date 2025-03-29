@@ -30,7 +30,6 @@ class PdfViewScreen : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.activity_pdf_view_screen)
 
         pdfView = findViewById(R.id.pdfView)

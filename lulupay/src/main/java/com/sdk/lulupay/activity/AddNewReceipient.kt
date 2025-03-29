@@ -136,7 +136,6 @@ class AddNewReceipient : AppCompatActivity(), BottomSheetListener, FinishActivit
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.add_new_receipient)
 
         luluPayDB = LuluPayDB(this)

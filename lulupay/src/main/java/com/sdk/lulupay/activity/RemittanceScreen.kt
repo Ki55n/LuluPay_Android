@@ -64,8 +64,6 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ThemeManager.setTheme(getIntent().getBooleanExtra(DARK_MODE, false))
-        setTheme(ThemeManager.getTheme())
         setContentView(R.layout.remittance)
 
         luluPayDB = LuluPayDB(this)
