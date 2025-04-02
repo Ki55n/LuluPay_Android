@@ -1,5 +1,7 @@
 package com.sdk.lulupay.network.client
 
+import com.sdk.lulupay.network.interceptor.DecryptionInterceptor
+import com.sdk.lulupay.network.interceptor.EncryptionInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -44,9 +46,9 @@ object RetrofitClient {
    */
   private val okHttpClient =
       OkHttpClient.Builder()
-          .connectTimeout(10000, TimeUnit.SECONDS)
-          .readTimeout(10000, TimeUnit.SECONDS)
-          .writeTimeout(10000, TimeUnit.SECONDS)
+          .connectTimeout(30, TimeUnit.SECONDS)
+          .readTimeout(30, TimeUnit.SECONDS)
+          .writeTimeout(30, TimeUnit.SECONDS)
           .addInterceptor(headerInterceptor)
           .addInterceptor(loggingInterceptor)
           .build()

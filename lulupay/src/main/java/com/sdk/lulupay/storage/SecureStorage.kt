@@ -3,6 +3,7 @@ package com.sdk.lulupay.storage
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Base64
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -13,6 +14,17 @@ object SecureStorage {
     private const val KEY_ALIAS = "MySecureKey"
     private const val ANDROID_KEYSTORE = "AndroidKeyStore"
     private const val TRANSFORMATION = "AES/GCM/NoPadding"
+
+    private const val AES_KEY_SIZE = 256
+    private const val GCM_TAG_LENGTH = 128
+
+    private val aesKey: SecretKey = generateAESKey()
+
+    private fun generateAESKey(): SecretKey {
+        val keyGen = KeyGenerator.getInstance("AES")
+        keyGen.init(AES_KEY_SIZE)
+        return keyGen.generateKey()
+    }
 
     /**
      * Generates an AES encryption key in the Android Keystore if one doesn't exist
@@ -41,7 +53,8 @@ object SecureStorage {
      * @param data String to encrypt
      * @return Pair of encrypted data bytes and initialization vector
      */
-    fun encryptData(data: String): Pair<ByteArray, ByteArray> {
+    fun encryptData(data: String?): Pair<ByteArray?, ByteArray?> {
+        if (data == null) return Pair(null, null)
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getKey())
         val iv = cipher.iv
@@ -60,6 +73,14 @@ object SecureStorage {
         val spec = GCMParameterSpec(128, iv)
         cipher.init(Cipher.DECRYPT_MODE, getKey(), spec)
         return String(cipher.doFinal(encryptedData))
+    }
+
+    fun decryptNetworkData(encryptedData: String, iv: String): String {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        val decodedIV = Base64.decode(iv, Base64.NO_WRAP)
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, GCMParameterSpec(GCM_TAG_LENGTH, decodedIV))
+        val decryptedBytes = cipher.doFinal(Base64.decode(encryptedData, Base64.NO_WRAP))
+        return String(decryptedBytes)
     }
 
     /**
