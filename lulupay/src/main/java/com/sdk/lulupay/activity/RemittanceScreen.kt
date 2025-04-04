@@ -1,6 +1,8 @@
 package com.sdk.lulupay.activity
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.os.Bundle
 import android.widget.*
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.sdk.lulupay.token.AccessToken
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.crypto.tink.subtle.Base64
 import com.sdk.lulupay.R
 import com.sdk.lulupay.database.*
 import com.sdk.lulupay.listeners.*
@@ -26,7 +29,9 @@ import kotlinx.coroutines.launch
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
+import com.sdk.lulupay.reporting.SecurityReport
 import com.sdk.lulupay.theme.ThemeManager
+import java.security.MessageDigest
 
 /**
  * RemittanceScreen Activity
@@ -36,7 +41,7 @@ import com.sdk.lulupay.theme.ThemeManager
  * - Manages transaction history
  * - Provides navigation to other screens
  */
-class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
+class RemittanceScreen : AppCompatActivity(), FinishActivityListener, SecurityReport {
 
     private lateinit var errorDialog: AlertDialog
     private lateinit var dialog: AlertDialog
@@ -74,6 +79,7 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
         getHistoryRemittance()
         setClickListener()
     }
+
 
     /**
      * Registers activity close listener to handle activity cleanup
@@ -708,5 +714,19 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
     override fun onDestroy() {
         super.onDestroy()
         destroyListeners()
+    }
+
+    override fun onSecurityViolation(message: String) {
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("Security Alert")
+                .setMessage(message)
+                .setCancelable(false) // Prevent user from dismissing
+                .setPositiveButton("Exit") { _, _ ->
+                    finishAffinity() // Close all activities
+                    android.os.Process.killProcess(android.os.Process.myPid()) // Kill the app process
+                }
+                .show()
+        }
     }
 }
