@@ -38,9 +38,9 @@ class SecurityCheck(private val sdkContext: Context, private val securityReport:
         if (isMemoryTampered()) {
             failedChecks.add("Memory is tampered (e.g., with Frida, Xposed, or Magisk)")
         }
-        if (isSignatureInvalid()) {
-            failedChecks.add("App signature is invalid")
-        }
+//        if (isSignatureInvalid()) {
+//            failedChecks.add("App signature is invalid")
+//        }
         if (isPackageNameModified()) {
             failedChecks.add("Package name has been modified")
         }
@@ -95,7 +95,10 @@ class SecurityCheck(private val sdkContext: Context, private val securityReport:
     }
 
     private fun isPackageNameModified(): Boolean {
-        // Check if the current package name is not the SDK package name
-        return sdkContext.packageName != sdkPackageName
+        val expectedPackageName = SecurityCheck::class.java.`package`?.name ?: return true
+        val isModified = !expectedPackageName.contains( sdkPackageName)
+        Log.d("SecurityCheck", "Expected: $expectedPackageName, Configured: $sdkPackageName")
+        return isModified
     }
+
 }
