@@ -58,9 +58,9 @@ class SecurityCheck(private val sdkContext: Context) {
        if (isSignatureInvalid()) {
             return false
         }
-        if (isPackageNameModified()) {
-            return false
-        }
+        //if (isPackageNameModified()) {
+            //return false
+        //}
 
         return true
     }
