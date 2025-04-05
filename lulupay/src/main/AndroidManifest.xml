@@ -24,7 +24,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.RemittanceScreen"
@@ -32,7 +31,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.AddNewReceipient"
@@ -40,7 +38,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.InputScreen"
@@ -48,7 +45,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.RemittanceDetails"
@@ -56,7 +52,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.RemittanceSuccessScreen"
@@ -64,7 +59,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.RemittanceReceipt"
@@ -72,7 +66,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
 
         <activity
@@ -81,7 +74,6 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Base.Theme.LuLuBanking"
             android:windowSoftInputMode="stateHidden" />
 
         <provider

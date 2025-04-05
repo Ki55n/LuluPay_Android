@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
 import android.content.Intent
+import android.media.Image
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +23,7 @@ import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
 import com.sdk.lulupay.preference.PreferencesHelper
 import com.sdk.lulupay.theme.ThemeManager
+import kotlin.properties.Delegates
 
 /**
  * LoginScreen Activity
@@ -34,9 +37,11 @@ import com.sdk.lulupay.theme.ThemeManager
 class LoginScreen : AppCompatActivity() {
 
     private lateinit var dialog: AlertDialog
+    private var logoResId by Delegates.notNull<Int>()
     private lateinit var errorDialog: AlertDialog
     private lateinit var login_btn: MaterialButton
     private lateinit var username_edittext: EditText
+    private lateinit var logo: ImageView
     private lateinit var password_edittext: TextInputEditText
 
     /* private var isRemittance: Boolean = false
@@ -55,7 +60,7 @@ class LoginScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
-
+        logoResId = intent.getIntExtra("LOGO_RES_ID", -1)
         setupViews()
     }
 
@@ -185,7 +190,12 @@ class LoginScreen : AppCompatActivity() {
     private fun setupViews() {
         login_btn = findViewById(R.id.login_btn)
         username_edittext = findViewById(R.id.username)
+        logo = findViewById(R.id.logo)
         password_edittext = findViewById(R.id.password)
+
+// Set the logo to the ImageView
+        if (logoResId!=-1)
+            logo.setImageResource(logoResId)
 
         login_btn.setOnClickListener {
             val username: String = username_edittext.text.toString()

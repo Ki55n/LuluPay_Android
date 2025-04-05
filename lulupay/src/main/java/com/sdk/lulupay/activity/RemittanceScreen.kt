@@ -2,6 +2,7 @@ package com.sdk.lulupay.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.recyclerview.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +25,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
 import com.sdk.lulupay.report.SecurityReport
+import kotlin.properties.Delegates
 
 /**
  * RemittanceScreen Activity
@@ -45,6 +47,7 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
     private val USERNAME: String = "USERNAME"
     private val PASSWORD: String = "PASSWORD"
     private val DARK_MODE: String = "ISDARKMODE"
+    private var logoResId by Delegates.notNull<Int>()
 
     private lateinit var addNewReceipientFab: FloatingActionButton
     private lateinit var recyclerView: RecyclerView
@@ -63,6 +66,17 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.remittance)
 
+        val useMainAppTheme = intent.getBooleanExtra("USE_MAIN_APP_THEME", false)
+        logoResId = intent.getIntExtra("LOGO_RES_ID", -1)
+
+        // Step 2: Apply theme conditionally
+        if (useMainAppTheme) {
+            Log.d("RemittanceScreen", "Using main app theme")
+            // No need to set, as main app theme will automatically apply
+        } else {
+            Log.d("RemittanceScreen", "Using SDK theme")
+            setTheme(R.style.Base_Theme_LuLuBanking)
+        }
         luluPayDB = LuluPayDB(this)
 
         registerListeners()
@@ -614,6 +628,7 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
      */
     private fun redirectToLoginScreen() {
         val intent = Intent(this, LoginScreen::class.java)
+        intent.putExtra("LOGO_RES_ID", logoResId)
         startActivity(intent)
         finish()
     }

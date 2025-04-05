@@ -17,6 +17,12 @@ class MainActivity : AppCompatActivity() {
             this@MainActivity,
             RemittanceScreen::class.java
         )
+        // Pass the theme decision
+        intent.putExtra("USE_MAIN_APP_THEME", true)
+
+        // Pass the logo resource (if drawable resource ID)
+        intent.putExtra("LOGO_RES_ID", R.drawable.logo_test)
+
 
         val btn: AppCompatButton = findViewById(R.id.btnPayment);
         btn.setOnClickListener {

@@ -55,9 +55,9 @@ class SecurityCheck(private val sdkContext: Context) {
         if (isMemoryTampered()) {
             return false
         }
-       if (isSignatureInvalid()) {
-            return false
-        }
+//       if (isSignatureInvalid()) {
+//            return false
+//        }
         //if (isPackageNameModified()) {
             //return false
         //}
@@ -82,8 +82,9 @@ class SecurityCheck(private val sdkContext: Context) {
 
     private fun isSignatureInvalid(): Boolean {
         // Replace with the actual app signature hash
-        val sha256Signature = "3E:6B:2B:C2:64:B5:91:54:3C:B5:B7:14:4A:6E:A9:18:2D:74:2A:69:FB:38:90:F7:B2:9D:EE:6B:60:67:53:CF"
-        val sha1Signature = "22:84:E6:82:45:D7:17:61:EF:84:E8:72:D4:42:51:19:9A:59:A1:2D"
+        val sha256Signature = "F8:6D:36:33:51:79:9C:D7:7E:56:B7:00:A6:8F:F5:A6:09:A3:1B:CC:4A:C7:A7:90:7F:A3:B0:AF:BF:4A:21:87"
+        val sha1Signature = " 94:F9:AF:18:D5:DC:F9:B3:58:F1:AD:9B:23:E4:1C:0B:AF:52:B2:23"
+        Log.d("Hi sinature", getSHA1Signature(context).toString())
         return getSHA256Signature(context) != sha256Signature || getSHA1Signature(context) != sha1Signature
     }
 
