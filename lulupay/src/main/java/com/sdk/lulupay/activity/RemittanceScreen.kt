@@ -1,9 +1,6 @@
 package com.sdk.lulupay.activity
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
 import android.os.Bundle
 import android.widget.*
 import androidx.recyclerview.widget.*
@@ -12,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.sdk.lulupay.token.AccessToken
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.crypto.tink.subtle.Base64
 import com.sdk.lulupay.R
 import com.sdk.lulupay.database.*
 import com.sdk.lulupay.listeners.*
@@ -23,15 +19,11 @@ import com.sdk.lulupay.recyclerView.*
 import com.sdk.lulupay.requestId.RequestId
 import com.sdk.lulupay.singleton.ActivityCloseManager
 import com.sdk.lulupay.storage.SecureLoginStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
-import com.sdk.lulupay.reporting.SecurityReport
-import com.sdk.lulupay.theme.ThemeManager
-import java.security.MessageDigest
+import com.sdk.lulupay.application.reporting.SecurityReport
 
 /**
  * RemittanceScreen Activity

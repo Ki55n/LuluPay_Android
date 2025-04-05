@@ -10,8 +10,12 @@
     <uses-feature android:name="android.hardware.fingerprint" android:required="false"/>
 
 
-    <application>
-        <activity
+    <application
+        android:name=".application.LulupayApplication"
+
+        >
+
+    <activity
             android:name=".activity.PdfViewScreen"
             android:exported="false" />
         <activity
