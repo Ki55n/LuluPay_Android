@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sdk.lulupay.authentication.BiometricHelper
-import com.sdk.lulupay.application.reporting.SecurityReport
+import com.sdk.lulupay.report.SecurityReport
 
 /**
  * RemittanceScreen Activity
@@ -33,7 +33,7 @@ import com.sdk.lulupay.application.reporting.SecurityReport
  * - Manages transaction history
  * - Provides navigation to other screens
  */
-class RemittanceScreen : AppCompatActivity(), FinishActivityListener, SecurityReport {
+class RemittanceScreen : AppCompatActivity(), FinishActivityListener {
 
     private lateinit var errorDialog: AlertDialog
     private lateinit var dialog: AlertDialog
@@ -706,19 +706,5 @@ class RemittanceScreen : AppCompatActivity(), FinishActivityListener, SecurityRe
     override fun onDestroy() {
         super.onDestroy()
         destroyListeners()
-    }
-
-    override fun onSecurityViolation(message: String) {
-        runOnUiThread {
-            AlertDialog.Builder(this)
-                .setTitle("Security Alert")
-                .setMessage(message)
-                .setCancelable(false) // Prevent user from dismissing
-                .setPositiveButton("Exit") { _, _ ->
-                    finishAffinity() // Close all activities
-                    android.os.Process.killProcess(android.os.Process.myPid()) // Kill the app process
-                }
-                .show()
-        }
     }
 }

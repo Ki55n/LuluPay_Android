@@ -20,10 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep class com.sdk.lulupay.security.** { *; }
--keep class com.sdk.lulupay.reporting.** { *; }
+-keep class com.sdk.lulupay.report.** { *; }
 # Prevent security-related classes from being decompiled or altered
 -keepclassmembers class com.sdk.lulupay.security.** { *; }
--keepclassmembers class com.sdk.lulupay.reporting.** { *; }
+-keepclassmembers class com.sdk.lulupay.report.** { *; }
 
 # Prevent debugging tools like Frida from analyzing your app
 -assumenosideeffects class android.util.Log { *; }
